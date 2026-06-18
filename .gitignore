@@ -1,0 +1,94 @@
+# ==============================================================================
+# Environment / Secret Files (Matches at ANY folder level)
+# ==============================================================================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+**/*.env*
+.env.*
+!.env.example
+
+# ==============================================================================
+# Go (Golang) Staff
+# ==============================================================================
+# Compiled binaries and directories
+bin/
+dist/
+architecture/output/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test and coverage artifacts
+*.test
+*.out
+c.out
+
+# Go workspace file
+go.work
+go.work.sum
+
+# ==============================================================================
+# Python Staff
+# ==============================================================================
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Poetry, Pipenv, and packaging artifacts
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.tox/
+
+# ==============================================================================
+# TypeScript / JS / Bun Staff
+# ==============================================================================
+node_modules/
+bun.lockb
+
+# Outputs
+out/
+dist/
+*.tgz
+
+# Code coverage
+coverage/
+*.lcov
+
+# Logs
+logs/
+*.log
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Caches
+.eslintcache
+.cache
+*.tsbuildinfo
+
+# ==============================================================================
+# IDEs and OS Metadata
+# ==============================================================================
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+.DS_Store
