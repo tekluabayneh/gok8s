@@ -98,4 +98,4 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 # Database / etcd Data Directories
 # ==============================================================================
 *.etcd/
-data.etcd/
+**/default.etcd/
