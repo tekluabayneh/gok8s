@@ -3,6 +3,11 @@ module github.com/tekluabayneh/gok8s
 go 1.26.4
 
 require (
+	github.com/go-chi/chi/v5 v5.3.0
+	go.etcd.io/etcd/client/v3 v3.6.12
+)
+
+require (
 	github.com/coreos/go-semver v0.3.1 // indirect
 	github.com/coreos/go-systemd/v22 v22.5.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
@@ -10,7 +15,6 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.3 // indirect
 	go.etcd.io/etcd/api/v3 v3.6.12 // indirect
 	go.etcd.io/etcd/client/pkg/v3 v3.6.12 // indirect
-	go.etcd.io/etcd/client/v3 v3.6.12 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/net v0.52.0 // indirect
