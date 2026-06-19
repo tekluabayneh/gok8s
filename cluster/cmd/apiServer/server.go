@@ -1,45 +1,46 @@
 package apiserver
 
 import (
-	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
-	Client "github.com/tekluabayneh/gok8s/cmd/etcd"
+	"github.com/tekluabayneh/gok8s/cmd/apiServer/routers"
 )
 
-// TODO
-//	create server without any
+// Does this data live on the stack or the heap?
+// Am I passing a value, a pointer, or a reference—and who owns it?
+// Can multiple threads/goroutines touch this at the same time?
+// What is the source of truth—and where is the state machine?
+// When this loop/function panics or errors out, what state is left behind?
+// What is the absolute worst-case time and space complexity here?
+// What system call does this trigger under the hood?
+// What happens to the file descriptor, socket, or pipe if this process dies?
+// Why this specific data structure shape and not another?
+// What happens if the network latency spikes or a timeout occurs?
+type APIServerType struct {
+	router http.Handler
+}
 
-func ApiServer() {
-	etcdDB, err := Client.InitEtcd()
-	if err != nil {
-		fmt.Println(err)
-		return
+func AppAPIServerNew() *APIServerType {
+	return &APIServerType{
+		router: routers.LoadRouter(),
+	}
+}
+
+func (app *APIServerType) APIServerStart() {
+	PORT := "5000"
+	apiServ := &http.Server{
+		Addr:         ":" + PORT,
+		Handler:      app.router,
+		ReadTimeout:  5 * time.Second,
+		IdleTimeout:  5 * time.Second,
+		WriteTimeout: 5 * time.Second,
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	res, err := etcdDB.Put(ctx, "example_key", "example_value")
-	if err != nil {
-		return
+	fmt.Printf("Server is running on post %v", PORT)
+	if err := apiServ.ListenAndServe(); err != nil {
+		log.Fatal("Server failed to run ", err.Error())
 	}
-
-	fmt.Println("res", res)
-
-	fmt.Println(etcdDB.Get(ctx, "example_key"))
-
-	mux := http.NewServeMux()
-	mux.HandleFunc("GET /path/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, "got path\n")
-	})
-	mux.HandleFunc("/task/{id}/", func(w http.ResponseWriter, r *http.Request) {
-		id := r.PathValue("id")
-		fmt.Fprintf(w, "handling task with id=%v\n", id)
-	})
-
-	fmt.Println("apiServer started")
-	http.ListenAndServe("localhost:5000", mux)
 }
