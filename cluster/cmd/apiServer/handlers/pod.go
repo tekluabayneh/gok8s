@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/tekluabayneh/gok8s/internals/etcd"
 )
 
 type PodStore interface {
-	GetPod(ctx context.Context, namespace, name string) (string, error)
+	GetPod(ctx context.Context, namespace, name string, kind etcd.ResourceType) (string, error)
 	CreatePod(ctx context.Context, pod string) error
 	DeletePod(ctx context.Context, namespace string, pod string) error
 }
@@ -21,7 +23,7 @@ func (p *PodHnalder) Get(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("this is get pdo handler")
 	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
 	defer cancel()
-	if _, err := p.Store.GetPod(ctx, "name", "namespace"); err != nil {
+	if _, err := p.Store.GetPod(ctx, "name", "namespace", "configMaps"); err != nil {
 		fmt.Println(err)
 	}
 }
