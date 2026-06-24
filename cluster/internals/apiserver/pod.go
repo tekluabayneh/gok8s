@@ -14,6 +14,15 @@ type EtcdStore struct {
 
 func (store *EtcdStore) GetPod(ctx context.Context, namespace, name string, kind etcd.ResourceType) (string, error) {
 	fmt.Println("this is the getPod object that handler logincs")
+	// LIFECYCLE: the GetPod() handler itself will stay in the code segment till there is request comming
+	// MEMORY: it won't go to the EITHER the Heap OR the Stack it state in the Code Segment
+	// FLOW: it only run when the cpu get request and want to access this handler block of code form the code segment
+	//
+	// 1. Allocation: Code Segment and accessed by the cpu when instruction require it
+	// 2. Concurrency: Built on a single thread; concurrently read by thousands of HTTP request goroutines safely.
+	// 3. Layout: its just way of accessing EtcdStore database and only name, namespace, kind, context,
+	// 4. Failure: If request fail it wont' panic or crash the server it only request server error message
+
 	res, err := etcd.GetEtcd(ctx, store.client, name, namespace, kind)
 	if err != nil {
 		fmt.Println(err)
