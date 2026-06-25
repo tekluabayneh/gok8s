@@ -82,6 +82,10 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 .eslintcache
 .cache
 *.tsbuildinfo
+./help.md
+*./help.md
+*.help.md
+.help.md
 
 # ==============================================================================
 # IDEs and OS Metadata
