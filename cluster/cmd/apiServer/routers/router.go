@@ -40,7 +40,8 @@ func LoadRouter() *chi.Mux {
 		// 3. Layout: Struct wrapping the underlying cluster client pointer (`*clientv3.Client`).
 		// 4. Failure: If driver configuration crashes, it halts startup; runtime database drops cause handled errors.
 
-		Handler := &handlers.PodHnalder{Store: etcdSore}
+		HandlerPod := &handlers.PodHnalder{Store: etcdSore}
+		HandlerNode := &handlers.NodeHandler{Store: etcdSore}
 		// LIFECYCLE: Core orchestration layer controller handler wrapper.
 		// MEMORY: Heap. The pointer address (`&`) escapes the stack because it's bound to the router endpoints.
 		// FLOW: Injected into specific HTTP routes to bridge incoming requests directly to the etcd backend store.
@@ -56,8 +57,13 @@ func LoadRouter() *chi.Mux {
 			})
 		})
 
-		api.Get("/namespace/{namespace}/pods/{name}", Handler.Get)
-		api.Post("/{namespace}/{name}", Handler.Create)
+		// pods
+		api.Get("/namespace/{namespace}/pods/{name}", HandlerPod.Get)
+		api.Post("/{namespace}/{name}", HandlerPod.Create)
+
+		// nodes
+		api.Get("/namespace/{namespace}/nodes/{name}", HandlerNode.GetNodeHandler)
+		api.Post("/{namespace}/{name}", HandlerNode.RegisterNodeHandler)
 	})
 
 	return router
