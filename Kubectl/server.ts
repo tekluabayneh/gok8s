@@ -6,7 +6,7 @@ const app = express()
 app.get("/", (req, res) => {
   console.log("test")
   try {
-    let val = load(readFileSync("./file.yaml", 'utf8'))
+    let val = load(readFileSync("./pod.yaml", 'utf8'))
     console.log(val)
     res.send(val)
   } catch (error) {
