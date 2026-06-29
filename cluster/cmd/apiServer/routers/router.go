@@ -2,11 +2,13 @@ package routers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/tekluabayneh/gok8s/cmd/apiServer/handlers"
 	internals "github.com/tekluabayneh/gok8s/internals/apiserver"
+	"github.com/tekluabayneh/gok8s/internals/etcd"
 )
 
 func LoadRouter() *chi.Mux {
@@ -29,8 +31,16 @@ func LoadRouter() *chi.Mux {
 		// 2. Concurrency: Single-threaded configuration block. Thread-safe concurrent read lookups at runtime.
 		// 3. Layout: Sub-tree instance matching path prefixes.
 		// 4. Failure: A panic inside this inline setup block kills the process before the server starts listening.
+		//
+		cli, err := etcd.InitEtcd()
+		if err != nil {
+			panic(fmt.Sprintf("failed to initialize etcd infrastructure: %v", err))
+		}
 
-		etcdSore := &internals.EtcdStore{}
+		etcdSore := &internals.EtcdStore{
+			Client: cli,
+		}
+
 		// LIFECYCLE: Shared infrastructure state. Persistent database connection context wrapper.
 		// MEMORY: Heap allocation via pointer referencing (`&`). Escapes because it's wrapped into the handler.
 		// FLOW: Declared once on the startup thread; acts as a global pointer pass-through to database operations.
@@ -58,7 +68,7 @@ func LoadRouter() *chi.Mux {
 		})
 
 		// pods
-		api.Get("/namespace/{namespace}/pods/{name}", HandlerPod.Get)
+		api.Post("/namespace/{namespace}/pods/{name}", HandlerPod.Get)
 		api.Post("/{namespace}/{name}", HandlerPod.Create)
 
 		// nodes

@@ -6,11 +6,12 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/tekluabayneh/gok8s/internals/etcd"
+	"github.com/tekluabayneh/gok8s/config"
+	"github.com/tekluabayneh/gok8s/internals/mapper"
 )
 
 type PodStore interface {
-	GetPod(ctx context.Context, namespace, name string, kind etcd.ResourceType) (string, error)
+	GetPod(ctx context.Context, res config.Pod) (string, error)
 	CreatePod(ctx context.Context, pod string) error
 	DeletePod(ctx context.Context, namespace string, pod string) error
 }
@@ -20,6 +21,7 @@ type PodHnalder struct {
 }
 
 func (p *PodHnalder) Get(w http.ResponseWriter, r *http.Request) {
+	PodData := Decoder(r)
 	// LIFECYCLE: the Get() handler itself will stay in the code segment till there is request comming
 	// MEMORY: it won't go to the EITHER the Heap OR the Stack it state in the Code Segment
 	// FLOW: it only run when the cpu get request and want to access this handler block of code form the code segment
@@ -32,6 +34,7 @@ func (p *PodHnalder) Get(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("this is get pdo handler")
 
 	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+	defer cancel()
 	// LIFECYCLE: this context.WithTimeout get called when ever Get handler is called  and wait 5 second using go Runtime schduler and alert us when it finishes
 	// MEMORY: it will scape to heap due to internal challen Done and cancel closure function
 	// FLOW: it runs when the handler called and GO runtime will  and go tkae pointer stack to teh channle of Done so this get ckicked to heap
@@ -41,9 +44,14 @@ func (p *PodHnalder) Get(w http.ResponseWriter, r *http.Request) {
 	// 3. Layout: it accept context and tie how long it will wait
 	// 4. Failure: If request fail it wont' panic or crash the server it just propagates a cancellation signal message/error.
 
-	defer cancel()
+	// TODO
+	// this data need to be replaced by actual http body request
+	// HAVE ONE CENTRAL PLACE THAT HANDLE TRANSLATING THE INCOMING JSON TO FILLED WITH VOUE STRUCT SO I CAN JUST STORE IT
+	// AND ALSO DECIDED IF THE INCOMING BODY IS ONLY POD OR POD INSIDE DEPLOYMENT OR JUST IDENTIFY AND MAP TO APPROPRATE STRUCT
 
-	if _, err := p.Store.GetPod(ctx, "name", "namespace", "configMaps"); err != nil {
+	res := mapper.ToPod(PodData)
+
+	if _, err := p.Store.GetPod(ctx, res); err != nil {
 		fmt.Println(err)
 	}
 }
