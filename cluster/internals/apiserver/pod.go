@@ -4,15 +4,16 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/tekluabayneh/gok8s/config"
 	"github.com/tekluabayneh/gok8s/internals/etcd"
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
 type EtcdStore struct {
-	client *clientv3.Client
+	Client *clientv3.Client
 }
 
-func (store *EtcdStore) GetPod(ctx context.Context, namespace, name string, kind etcd.ResourceType) (string, error) {
+func (store *EtcdStore) GetPod(ctx context.Context, conf config.Pod) (string, error) {
 	fmt.Println("this is the getPod object that handler logincs")
 	// LIFECYCLE: the GetPod() handler itself will stay in the code segment till there is request comming
 	// MEMORY: it won't go to the EITHER the Heap OR the Stack it state in the Code Segment
@@ -23,7 +24,8 @@ func (store *EtcdStore) GetPod(ctx context.Context, namespace, name string, kind
 	// 3. Layout: its just way of accessing EtcdStore database and only name, namespace, kind, context,
 	// 4. Failure: If request fail it wont' panic or crash the server it only request server error message
 
-	res, err := etcd.GetEtcd(ctx, store.client, name, namespace, kind)
+	// res, err := etcd.GetEtcd(ctx, store.client, res)
+	res, err := etcd.GetEtcd(ctx, store.Client, conf)
 	if err != nil {
 		fmt.Println(err)
 	}

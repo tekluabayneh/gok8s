@@ -2,27 +2,40 @@ package etcd
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
+	"github.com/tekluabayneh/gok8s/config"
 	"go.etcd.io/etcd/api/v3/v3rpc/rpctypes"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-// TODO
-//
-//	use buildKey to build the key before passing path to the etcd and same as when performing any ectd staff
-func GetEtcd(ctx context.Context, client *clientv3.Client, name, namespace string, kind ResourceType) (*clientv3.GetResponse, error) {
-	prefix := BuildKey(kind, namespace, name)
-	res, err := client.Get(ctx, prefix)
+func GetEtcd(ctx context.Context, client *clientv3.Client, conf config.Pod) (*clientv3.GetResponse, error) {
+	prefix := BuildKey(conf.Kind, conf.Metadata.Namespace, conf.Metadata.Name)
+
+	// TODO
+	// before string yaml value change to string
+	val, err := json.Marshal(conf)
+	if err != nil {
+		panic(err)
+	}
+	_, err = client.Put(ctx, prefix, string(val))
 	if err != nil {
 		return nil, handlerEtcdError(err)
 	}
+
+	res, err := client.Get(ctx, prefix)
+	fmt.Println("this is the value that retrived")
+	if err != nil {
+		return nil, handlerEtcdError(err)
+	}
+
 	return res, nil
 }
 
-func StoreEtcd(ctx context.Context, client *clientv3.Client, name, namespace, value string, kind ResourceType) (*clientv3.PutResponse, error) {
+func StoreEtcd(ctx context.Context, client *clientv3.Client, name, namespace, value string, kind string) (*clientv3.PutResponse, error) {
 	prefix := BuildKey(kind, namespace, name)
 	res, err := client.Put(ctx, prefix, value)
 	if err != nil {

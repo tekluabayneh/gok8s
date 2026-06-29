@@ -24,6 +24,5 @@ func InitEtcd() (*clientv3.Client, error) {
 		return nil, err
 	}
 
-	defer Client.Close()
 	return Client, nil
 }

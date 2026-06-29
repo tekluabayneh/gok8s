@@ -43,7 +43,7 @@ const (
 // [Root] ──► [Resource Type] ──► [Namespace Name] ──► [Resource Nam]
 // "registry" "pods or configmaps" "colab-app" "colab-app-pods"
 
-func BuildKey(kind ResourceType, namespace, name string) string {
+func BuildKey(kind, namespace, name string) string {
 	if namespace == "" {
 		return fmt.Sprintf("gok8s/%s/%s/", kind, name)
 	}
@@ -51,7 +51,7 @@ func BuildKey(kind ResourceType, namespace, name string) string {
 }
 
 // used for universal staff like nodes and other cluster wide staff
-func BuildPrefix(kind ResourceType, namespace string) string {
+func BuildPrefix(kind, namespace string) string {
 	if namespace == "" {
 		return fmt.Sprintf("gok8s/%s/", kind)
 	}
