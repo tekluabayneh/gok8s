@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/tekluabayneh/gok8s/config"
+	"github.com/tekluabayneh/gok8s/internals/decoder"
 	"github.com/tekluabayneh/gok8s/internals/mapper"
 )
 
@@ -21,7 +22,7 @@ type PodHnalder struct {
 }
 
 func (p *PodHnalder) Get(w http.ResponseWriter, r *http.Request) {
-	PodData := Decoder(r)
+	PodData := decoder.Decoder(r)
 	// LIFECYCLE: the Get() handler itself will stay in the code segment till there is request comming
 	// MEMORY: it won't go to the EITHER the Heap OR the Stack it state in the Code Segment
 	// FLOW: it only run when the cpu get request and want to access this handler block of code form the code segment
