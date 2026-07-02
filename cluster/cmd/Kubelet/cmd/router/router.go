@@ -13,7 +13,7 @@ func LoadRouter() *chi.Mux {
 
 	// TODO
 	// make sure to inject/add middleware to api.Route so they will be restricted
-	Router.Route("/api/v1/kubectl", func(api chi.Router) {
+	Router.Route("/api/v1/kubelet", func(api chi.Router) {
 		//  health chec
 		api.Route("/", func(r chi.Router) {
 			r.Get("/", func(w http.ResponseWriter, r *http.Request) {
