@@ -37,7 +37,7 @@ func LoadRouter() *chi.Mux {
 			panic(fmt.Sprintf("failed to initialize etcd infrastructure: %v", err))
 		}
 
-		etcdSore := &internals.EtcdStore{
+		etcdStore := &internals.EtcdStore{
 			Client: cli,
 		}
 
@@ -50,8 +50,8 @@ func LoadRouter() *chi.Mux {
 		// 3. Layout: Struct wrapping the underlying cluster client pointer (`*clientv3.Client`).
 		// 4. Failure: If driver configuration crashes, it halts startup; runtime database drops cause handled errors.
 
-		HandlerPod := &handlers.PodHnalder{Store: etcdSore}
-		HandlerNode := &handlers.NodeHandler{Store: etcdSore}
+		HandlerPod := &handlers.PodHnalder{Store: etcdStore}
+		HandlerNode := &handlers.NodeHandler{Store: etcdStore}
 		// LIFECYCLE: Core orchestration layer controller handler wrapper.
 		// MEMORY: Heap. The pointer address (`&`) escapes the stack because it's bound to the router endpoints.
 		// FLOW: Injected into specific HTTP routes to bridge incoming requests directly to the etcd backend store.
@@ -61,9 +61,11 @@ func LoadRouter() *chi.Mux {
 		// 3. Layout: Struct memory block holding an interface descriptor ($2$ words) mapping to `etcdStore`.
 		// 4. Failure: Internal panics inside handler methods are caught by net/http recovery; server stays alive.
 
-		router.Get("/", func(w http.ResponseWriter, r *http.Request) {
-			json.NewEncoder(w).Encode(map[string]string{
-				"message": "api Server is running",
+		api.Route("/", func(r chi.Router) {
+			r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+				json.NewEncoder(w).Encode(map[string]string{
+					"message": "api Server is running",
+				})
 			})
 		})
 

@@ -1,12 +1,15 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"time"
 
 	"github.com/tekluabayneh/gok8s/cmd/apiServer/routers"
+	internals "github.com/tekluabayneh/gok8s/internals/apiserver"
+	"github.com/tekluabayneh/gok8s/internals/etcd"
 )
 
 type APIServerType struct {
@@ -47,6 +50,7 @@ func AppAPIServerNew() *APIServerType {
 	return &APIServerType{
 		router: routers.LoadRouter(),
 	}
+
 	// 1. Stack or heap?
 	// Heap. You are returning a pointer (`*APIServerType`), forcing the struct to escape the function stack.
 
@@ -106,5 +110,31 @@ func (app *APIServerType) APIServerStart() {
 }
 
 func main() {
+	cli, err := etcd.InitEtcd()
+	if err != nil {
+		panic(err)
+	}
+	etcdStore := &internals.EtcdStore{
+		Client: cli,
+	}
+
+	// Spawns persistent gRPC watch streams for the foundational resources.
+	// The Go scheduler will park these goroutines when there is no cluster activity.
+
+	go etcd.StartResourceInformer(context.Background(), etcdStore.Client, "gok8s/Node")
+	go etcd.StartResourceInformer(context.Background(), etcdStore.Client, "gok8s/Pod")
+
+	go etcd.StartResourceInformer(context.Background(), etcdStore.Client, "gok8s/Deployment")
+	go etcd.StartResourceInformer(context.Background(), etcdStore.Client, "gok8s/ReplicaSets")
+
+	go etcd.StartResourceInformer(context.Background(), etcdStore.Client, "gok8s/Service")
+	go etcd.StartResourceInformer(context.Background(), etcdStore.Client, "gok8s/Endpoints")
+
+	// 4. Configuration, Secrets, & Isolation Scopes
+	go etcd.StartResourceInformer(context.Background(), etcdStore.Client, "gok8s/ConfigMaps")
+	go etcd.StartResourceInformer(context.Background(), etcdStore.Client, "gok8s/Secrets")
+	go etcd.StartResourceInformer(context.Background(), etcdStore.Client, "gok8s/Namespace")
+
+	// http server
 	AppAPIServerNew().APIServerStart()
 }

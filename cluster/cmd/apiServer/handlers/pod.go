@@ -32,7 +32,7 @@ func (p *PodHnalder) Get(w http.ResponseWriter, r *http.Request) {
 	// 3. Layout: it's http.request and http.ResponseWriter layout accessing what is coming and respoing what will leave and accpept PodHnalder struct pointer
 	// 4. Failure: If request fail it wont' panic or crash the server it only request server error message
 
-	fmt.Println("this is get pdo handler")
+	// fmt.Println("this is get pdo handler")
 
 	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
 	defer cancel()
