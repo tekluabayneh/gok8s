@@ -14,7 +14,7 @@ import (
 
 func GetEtcd(ctx context.Context, client *clientv3.Client, conf config.Pod) (*clientv3.GetResponse, error) {
 	prefix := BuildKey(conf.Kind, conf.Metadata.Namespace, conf.Metadata.Name)
-
+	fmt.Println("prefix val\n", prefix)
 	// TODO
 	// before string yaml value change to string
 	val, err := json.Marshal(conf)
@@ -27,7 +27,7 @@ func GetEtcd(ctx context.Context, client *clientv3.Client, conf config.Pod) (*cl
 	}
 
 	res, err := client.Get(ctx, prefix)
-	fmt.Println("this is the value that retrived")
+	// fmt.Println("this is the value that retrived")
 	if err != nil {
 		return nil, handlerEtcdError(err)
 	}
@@ -65,7 +65,7 @@ func DeleteEtcd(ctx context.Context, client *clientv3.Client, name string) (*cli
 
 func handlerEtcdError(err error) error {
 	if clientv3.IsConnCanceled(err) {
-		fmt.Println()
+		fmt.Println(err)
 	}
 
 	if err != nil {

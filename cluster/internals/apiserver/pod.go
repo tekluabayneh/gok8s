@@ -14,7 +14,7 @@ type EtcdStore struct {
 }
 
 func (store *EtcdStore) GetPod(ctx context.Context, conf config.Pod) (string, error) {
-	fmt.Println("this is the getPod object that handler logincs")
+	// fmt.Println("this is the getPod object that handler logincs")
 	// LIFECYCLE: the GetPod() handler itself will stay in the code segment till there is request comming
 	// MEMORY: it won't go to the EITHER the Heap OR the Stack it state in the Code Segment
 	// FLOW: it only run when the cpu get request and want to access this handler block of code form the code segment
