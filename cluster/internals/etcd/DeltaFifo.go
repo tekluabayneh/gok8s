@@ -2,20 +2,11 @@ package etcd
 
 import (
 	"fmt"
-
-	"go.etcd.io/etcd/api/v3/mvccpb"
 )
 
 // TODO
 // implement first in last out queue
 // i need way to do like CRUD opration in queue
-type IDeltaFIFO interface {
-	Add(EventType mvccpb.Event_EventType, EventKey []byte, EventModeRevision int64)
-	Delete(EventType mvccpb.Event_EventType, EventKey []byte, EventModeRevision int64)
-	Update(EventType mvccpb.Event_EventType, EventKey []byte, EventModeRevision int64)
-	Sync(EventType mvccpb.Event_EventType, EventKey []byte, EventModeRevision int64)
-}
-
 type DeltaType string
 
 const (
@@ -25,43 +16,67 @@ const (
 	Sync    DeltaType = "Sync"
 )
 
+type IDeltaFIFO interface {
+	Add(EventKey []byte, EventModeRevision int64)
+	Delete(EventKey []byte, EventModeRevision int64)
+	Update(EventKey []byte, EventModeRevision int64)
+	Sync(EventKey []byte, EventModeRevision int64)
+	Pop()
+	List() []interface{}
+}
+
 type Delta struct {
 	Type   DeltaType
 	Object interface{}
 }
 
 type DeltaFIFO struct {
-	queue []string
-	item  map[string]Delta
+	Item  map[string][]Delta
+	Queue []string
 }
 
-func (Del *DeltaFIFO) Add(EventType mvccpb.Event_EventType, EventKey []byte, EventModeRevision int64) {
-	fmt.Printf("Type: %s, Key: %s, Revision: %d\n", EventType, EventKey, EventModeRevision)
+var Fifo IDeltaFIFO = &DeltaFIFO{
+	Item:  make(map[string][]Delta),
+	Queue: []string{},
+}
 
-	DeltaFIFO{
-		queue: []string{
-			"EventKey",
-		},
-
-		item: map[string]string{
-			"EventKey": {
-				{
-					Type:   Added,
-					Object: "EventKey",
-				},
-			},
-		},
+func (d *DeltaFIFO) Add(EventKey []byte, EventModeRevision int64) {
+	fmt.Printf(" Key: %s, Revision: %d\n", EventKey, EventModeRevision)
+	key := string(EventKey)
+	d.Queue = append(d.Queue, key)
+	delta := Delta{
+		Type:   "Added",
+		Object: EventKey,
 	}
+	d.Item[key] = append(d.Item[key], delta)
+
+	fmt.Printf("Add called\n")
+
+	fmt.Println(d.Item)
+	fmt.Println(d.Queue)
 }
 
-func (Del *DeltaFIFO) Delete(EventType mvccpb.Event_EventType, EventKey []byte, EventModeRevision int64) {
-	fmt.Printf("Type: %s, Key: %s, Revision: %d\n", EventType, EventKey, EventModeRevision)
+func (Del *DeltaFIFO) Delete(EventKey []byte, EventModeRevision int64) {
+	fmt.Printf("Key: %s, Revision: %d\n", EventKey, EventModeRevision)
+	fmt.Printf("delete called")
 }
 
-func (Del *DeltaFIFO) Update(EventType mvccpb.Event_EventType, EventKey []byte, EventModeRevision int64) {
-	fmt.Printf("Type: %s, Key: %s, Revision: %d\n", EventType, EventKey, EventModeRevision)
+func (d *DeltaFIFO) Update(EventKey []byte, EventModeRevision int64) {
+	fmt.Println(d.Item)
+	fmt.Println(d.Queue)
+
+	fmt.Printf("update called")
 }
 
-func (Del *DeltaFIFO) Sync(EventType mvccpb.Event_EventType, EventKey []byte, EventModeRevision int64) {
-	fmt.Printf("Type: %s, Key: %s, Revision: %d\n", EventType, EventKey, EventModeRevision)
+func (d *DeltaFIFO) Sync(EventKey []byte, EventModeRevision int64) {
+	fmt.Printf("sync... called")
+}
+
+func (d *DeltaFIFO) Pop() {
+	fmt.Printf("Pop... called")
+}
+
+func (d *DeltaFIFO) List() []interface{} {
+	fmt.Printf("list of Delta's")
+	return nil
 }

@@ -25,12 +25,12 @@ func (store *EtcdStore) GetPod(ctx context.Context, conf config.Pod) (string, er
 	// 4. Failure: If request fail it wont' panic or crash the server it only request server error message
 
 	// res, err := etcd.GetEtcd(ctx, store.client, res)
-	res, err := etcd.GetEtcd(ctx, store.Client, conf)
+	_, err := etcd.GetEtcd(ctx, store.Client, conf)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	fmt.Println(res)
+	// fmt.Println(res)
 
 	return "", nil
 }

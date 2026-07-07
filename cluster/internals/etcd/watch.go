@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"go.etcd.io/etcd/api/v3/mvccpb"
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
@@ -13,7 +14,16 @@ func StartResourceInformer(ctx context.Context, client *clientv3.Client, resType
 	for response := range watcher { // this is blocking wating for new change and grpc will stream to this channel if there is not data scheduler will park this routing
 		for _, event := range response.Events {
 			/// based on the even time call the Delta's function
-			IDeltaFIFO.Add(event.Type, event.Kv.Key, event.Kv.ModRevision)
+			switch event.Type {
+			case mvccpb.PUT:
+				if event.IsCreate() {
+					Fifo.Add(event.Kv.Key, event.Kv.ModRevision)
+				} else {
+					Fifo.Update(event.Kv.Key, event.Kv.ModRevision)
+				}
+			case mvccpb.DELETE:
+				Fifo.Delete(event.Kv.Key, event.Kv.ModRevision)
+			}
 		}
 	}
 }
