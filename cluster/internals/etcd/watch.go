@@ -17,9 +17,9 @@ func StartResourceInformer(ctx context.Context, client *clientv3.Client, resType
 			switch event.Type {
 			case mvccpb.PUT:
 				if event.IsCreate() {
-					Fifo.Add(event.Kv.Key, event.Kv.ModRevision)
+					Fifo.Add(event.Kv.Key, event.Kv.Value, event.Kv.ModRevision)
 				} else {
-					Fifo.Update(event.Kv.Key, event.Kv.ModRevision)
+					Fifo.Update(event.Kv.Key, event.Kv.Value, event.Kv.ModRevision)
 				}
 			case mvccpb.DELETE:
 				Fifo.Delete(event.Kv.Key, event.Kv.ModRevision)

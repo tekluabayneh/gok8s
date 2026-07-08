@@ -17,9 +17,9 @@ const (
 )
 
 type IDeltaFIFO interface {
-	Add(EventKey []byte, EventModeRevision int64)
+	Add(EventKey, EvenKeyVal []byte, EventModeRevision int64)
 	Delete(EventKey []byte, EventModeRevision int64)
-	Update(EventKey []byte, EventModeRevision int64)
+	Update(EventKey, EvenKeyVal []byte, EventModeRevision int64)
 	Sync(EventKey []byte, EventModeRevision int64)
 	Pop()
 	List() []interface{}
@@ -27,33 +27,36 @@ type IDeltaFIFO interface {
 
 type Delta struct {
 	Type   DeltaType
-	Object interface{}
+	Object string
 }
 
 type DeltaFIFO struct {
-	Item  map[string][]Delta
-	Queue []string
+	Item        map[string][]Delta
+	Queue       []string
+	LookUpQueue map[string]bool
 }
 
 var Fifo IDeltaFIFO = &DeltaFIFO{
-	Item:  make(map[string][]Delta),
-	Queue: []string{},
+	Item:        make(map[string][]Delta),
+	Queue:       []string{},
+	LookUpQueue: make(map[string]bool),
 }
 
-func (d *DeltaFIFO) Add(EventKey []byte, EventModeRevision int64) {
-	fmt.Printf(" Key: %s, Revision: %d\n", EventKey, EventModeRevision)
+func (d *DeltaFIFO) Add(EventKey, EvenKeyVal []byte, EventModeRevision int64) {
 	key := string(EventKey)
-	d.Queue = append(d.Queue, key)
+
 	delta := Delta{
 		Type:   "Added",
-		Object: EventKey,
+		Object: string(EvenKeyVal),
+	}
+
+	if ok := d.LookUpQueue[key]; !ok {
+		d.Queue = append(d.Queue, key)
+		d.LookUpQueue[key] = true
 	}
 	d.Item[key] = append(d.Item[key], delta)
-
-	fmt.Printf("Add called\n")
-
-	fmt.Println(d.Item)
-	fmt.Println(d.Queue)
+	fmt.Println("Queue", d.Queue)
+	fmt.Println("Item", d.Item)
 }
 
 func (Del *DeltaFIFO) Delete(EventKey []byte, EventModeRevision int64) {
@@ -61,22 +64,34 @@ func (Del *DeltaFIFO) Delete(EventKey []byte, EventModeRevision int64) {
 	fmt.Printf("delete called")
 }
 
-func (d *DeltaFIFO) Update(EventKey []byte, EventModeRevision int64) {
-	fmt.Println(d.Item)
-	fmt.Println(d.Queue)
+func (d *DeltaFIFO) Update(EventKey, EvenKeyVal []byte, EventModeRevision int64) {
+	delta := Delta{
+		Type:   "Updated",
+		Object: string(EvenKeyVal),
+	}
 
-	fmt.Printf("update called")
+	d.Item[string(EventKey)] = append(d.Item[string(EventKey)], delta)
+
+	fmt.Println("Item", d.Item)
+	fmt.Println("Queue", d.Queue)
 }
 
 func (d *DeltaFIFO) Sync(EventKey []byte, EventModeRevision int64) {
 	fmt.Printf("sync... called")
+	fmt.Println("Item", d.Item)
+	fmt.Println("Queue", d.Queue)
 }
 
 func (d *DeltaFIFO) Pop() {
 	fmt.Printf("Pop... called")
+	fmt.Println("Item", d.Item)
+	fmt.Println("Queue", d.Queue)
 }
 
 func (d *DeltaFIFO) List() []interface{} {
 	fmt.Printf("list of Delta's")
+	fmt.Println("Item", d.Item)
+	fmt.Println("Queue", d.Queue)
+
 	return nil
 }
