@@ -22,7 +22,7 @@ func StartResourceInformer(ctx context.Context, client *clientv3.Client, resType
 					Fifo.Update(event.Kv.Key, event.Kv.Value, event.Kv.ModRevision)
 				}
 			case mvccpb.DELETE:
-				Fifo.Delete(event.Kv.Key, event.Kv.ModRevision)
+				Fifo.Delete(event.Kv.Key, event.Kv.Value, event.Kv.ModRevision)
 			}
 		}
 	}
