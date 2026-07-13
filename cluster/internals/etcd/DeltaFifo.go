@@ -22,7 +22,7 @@ type IDeltaFIFO interface {
 	Delete(EventKey, EvenKeyVal []byte, EventModeRevision int64) error
 	Update(EventKey, EvenKeyVal []byte, EventModeRevision int64) error
 	Sync(EventKey []byte, EventModeRevision int64)
-	Pop(any) (interface{}, error)
+	Pop(proccess func(item []Delta, id string) error) (interface{}, error)
 	List() any
 }
 
@@ -97,6 +97,11 @@ func (d *DeltaFIFO) Update(EventKey, EvenKeyVal []byte, EventModeRevision int64)
 func (d *DeltaFIFO) Delete(EventKey, EvenKeyVal []byte, EventModeRevision int64) error {
 	d.lock.Lock()
 	defer d.lock.Unlock()
+	key := string(EventKey)
+	if ok := d.LookUpQueue[key]; !ok {
+		return fmt.Errorf("couldn't delete, item does not exist with key of %s", key)
+	}
+
 	return d.queueActionInternalLocked(EventKey, EvenKeyVal, Deleted)
 }
 
@@ -106,15 +111,36 @@ func (d *DeltaFIFO) Sync(EventKey []byte, EventModeRevision int64) {
 	fmt.Println("Queue", d.Queue)
 }
 
-func (d *DeltaFIFO) Pop(procces any) (interface{}, error) {
+// / TODO
+// accpet func and return item and error
+// / check if the item does exist if so delete it before sending to controller process func
+// if it does not exist Log Error with it's id and continue iterating
+func (d *DeltaFIFO) Pop(proccess func(item []Delta, id string) error) (interface{}, error) {
 	d.lock.Lock()
 	defer d.lock.Unlock()
+
 	for {
 		if len(d.Queue) == 0 {
 			if d.close() {
 				fmt.Println("Queue is empty closed ")
+
+				// TODO
+				// implement mechanism to wait like holding and waiting
 			}
-			return nil, fmt.Errorf("queue is empty")
+
+			id := d.Queue[0]
+			d.Queue = d.Queue[1:] // update the Queue
+			item, ok := d.Item[id]
+
+			if !ok {
+				return nil, fmt.Errorf("queue is empty")
+			}
+
+			delete(d.Item, id)
+
+			err := proccess(item, id)
+
+			return item, err
 		}
 	}
 }
@@ -129,6 +155,7 @@ func (d *DeltaFIFO) List() any {
 			fmt.Printf("Delta Type %s and Delta object %s\n", Del.Type, Del.Object)
 		}
 	}
+
 	return nil
 }
 
