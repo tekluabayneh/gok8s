@@ -1,0 +1,15 @@
+reviews:
+  profile: chill
+  poem: false
+  high_level_summary: true
+  sequence_diagrams: false
+  collapse_walkthrough: true
+  instructions: |
+    Do not flag stylistic nitpicks like variable naming preferences, spacing, or comment phrasing.
+    Do not comment on typos, grammar, or wording in code comments or documentation.
+    Do not suggest adding comments where none exist.
+    Focus only on bugs, security issues, logic errors, and performance problems. 
+  auto_review:
+    enabled: true
+    base_branches:
+      - "dev"
