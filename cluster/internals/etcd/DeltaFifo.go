@@ -3,6 +3,8 @@ package etcd
 import (
 	"fmt"
 	"sync"
+
+	"github.com/tekluabayneh/gok8s/utils"
 )
 
 // TODO
@@ -57,11 +59,13 @@ func (d *DeltaFIFO) queueActionInternalLocked(EventKey, EvenKeyVal []byte, EvenT
 	key := string(EventKey)
 
 	if key == "" {
+		utils.Log().WithGroup("DeltaFIFO").Debug("queueActionInternalLocked func missing key", "Key", key)
 		return fmt.Errorf("event key missing %s key", key)
 	}
 
 	if EvenType == Deleted {
 		if ok := d.LookUpQueue[key]; !ok {
+			utils.Log().WithGroup("DeltaFIFO").Debug("couldn't find key from LookUpQueue", "Key", key)
 			return fmt.Errorf("couldn't delete, item does not exist with key of %s", key)
 		}
 	}
@@ -122,8 +126,7 @@ func (d *DeltaFIFO) Pop(proccess func(item []Delta, id string) error) (interface
 	for {
 		if len(d.Queue) == 0 {
 			if d.close() {
-				fmt.Println("Queue is empty closed ")
-
+				utils.Log().WithGroup("DeltaFIFO").Info("Queue is empty and closed waiting...")
 				// TODO
 				// implement mechanism to wait like holding and waiting
 			}
@@ -153,6 +156,7 @@ func (d *DeltaFIFO) List() any {
 	for _, Qu := range d.Item {
 		for _, Del := range Qu {
 			fmt.Printf("Delta Type %s and Delta object %s\n", Del.Type, Del.Object)
+			utils.Log().Info("Delta Type  and Delta object \n", Del.Type, Del.Object)
 		}
 	}
 

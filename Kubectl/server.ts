@@ -3,7 +3,8 @@ import express from "express"
 import { load, loadAll } from 'js-yaml'
 import { readFileSync } from 'node:fs'
 const app = express()
-app.get("/", (req, res) => {
+
+app.get("/api/v1/kubelet", (req, res) => {
   console.log("test")
   try {
     let val = load(readFileSync("./pod.yaml", 'utf8'))

@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -10,6 +9,7 @@ import (
 	"github.com/tekluabayneh/gok8s/cmd/apiServer/routers"
 	internals "github.com/tekluabayneh/gok8s/internals/apiserver"
 	"github.com/tekluabayneh/gok8s/internals/etcd"
+	"github.com/tekluabayneh/gok8s/utils"
 )
 
 type APIServerType struct {
@@ -103,7 +103,7 @@ func (app *APIServerType) APIServerStart() {
 	// 5. Cost: O(1) space/time for the struct wrapper wrapper; runtime tax is a single heap allocation.
 	//
 
-	fmt.Printf("Server is running on post %v", PORT)
+	utils.Log().Info("Service is running on port", "port", PORT)
 	if err := apiServ.ListenAndServe(); err != nil {
 		log.Fatal("Server failed to run ", err.Error())
 	}
@@ -135,6 +135,7 @@ func main() {
 	go etcd.StartResourceInformer(context.Background(), etcdStore.Client, "gok8s/Secrets")
 	go etcd.StartResourceInformer(context.Background(), etcdStore.Client, "gok8s/Namespace")
 
+	utils.InitLog(true, false)
 	// http server
 	AppAPIServerNew().APIServerStart()
 }

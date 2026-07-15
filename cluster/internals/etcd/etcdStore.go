@@ -2,9 +2,9 @@ package etcd
 
 import (
 	"context"
-	"fmt"
 	"time"
 
+	"github.com/tekluabayneh/gok8s/utils"
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
@@ -15,12 +15,12 @@ func InitEtcd() (*clientv3.Client, error) {
 	})
 
 	if err == context.DeadlineExceeded {
-		fmt.Println("context timeout")
+		utils.Log().WithGroup("InitEtcd").Info("context timeout")
 		return nil, err
 	}
 
 	if err != nil {
-		fmt.Println("context timeout")
+		utils.Log().WithGroup("InitEtcd").Debug("context timeout", "err", err)
 		return nil, err
 	}
 

@@ -17,11 +17,11 @@ type PodStore interface {
 	DeletePod(ctx context.Context, namespace string, pod string) error
 }
 
-type PodHnalder struct {
+type PodHanlder struct {
 	Store PodStore
 }
 
-func (p *PodHnalder) Get(w http.ResponseWriter, r *http.Request) {
+func (p *PodHanlder) Get(w http.ResponseWriter, r *http.Request) {
 	PodData := decoder.Decoder(r)
 	// LIFECYCLE: the Get() handler itself will stay in the code segment till there is request comming
 	// MEMORY: it won't go to the EITHER the Heap OR the Stack it state in the Code Segment
@@ -57,7 +57,7 @@ func (p *PodHnalder) Get(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (p *PodHnalder) Create(w http.ResponseWriter, r *http.Request) {
+func (p *PodHanlder) Create(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
 	defer cancel()
 	if err := p.Store.CreatePod(ctx, "name"); err != nil {
@@ -65,7 +65,7 @@ func (p *PodHnalder) Create(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (p *PodHnalder) Delete(w http.ResponseWriter, r *http.Request) {
+func (p *PodHanlder) Delete(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
 	defer cancel()
 	if err := p.Store.DeletePod(ctx, "namespace", "pod"); err != nil {

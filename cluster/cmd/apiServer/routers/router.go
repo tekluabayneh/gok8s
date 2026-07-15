@@ -2,13 +2,13 @@ package routers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/tekluabayneh/gok8s/cmd/apiServer/handlers"
 	internals "github.com/tekluabayneh/gok8s/internals/apiserver"
 	"github.com/tekluabayneh/gok8s/internals/etcd"
+	"github.com/tekluabayneh/gok8s/utils"
 )
 
 func LoadRouter() *chi.Mux {
@@ -34,7 +34,7 @@ func LoadRouter() *chi.Mux {
 		//
 		cli, err := etcd.InitEtcd()
 		if err != nil {
-			panic(fmt.Sprintf("failed to initialize etcd infrastructure: %v", err))
+			utils.Log().Error("failed to initialize etcd infrastructure:", "err message", err)
 		}
 
 		etcdStore := &internals.EtcdStore{
@@ -50,7 +50,7 @@ func LoadRouter() *chi.Mux {
 		// 3. Layout: Struct wrapping the underlying cluster client pointer (`*clientv3.Client`).
 		// 4. Failure: If driver configuration crashes, it halts startup; runtime database drops cause handled errors.
 
-		HandlerPod := &handlers.PodHnalder{Store: etcdStore}
+		HandlerPod := &handlers.PodHanlder{Store: etcdStore}
 		HandlerNode := &handlers.NodeHandler{Store: etcdStore}
 		// LIFECYCLE: Core orchestration layer controller handler wrapper.
 		// MEMORY: Heap. The pointer address (`&`) escapes the stack because it's bound to the router endpoints.

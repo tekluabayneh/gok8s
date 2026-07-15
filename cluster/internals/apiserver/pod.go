@@ -2,10 +2,10 @@ package internals
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/tekluabayneh/gok8s/config"
 	"github.com/tekluabayneh/gok8s/internals/etcd"
+	"github.com/tekluabayneh/gok8s/utils"
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
@@ -27,7 +27,7 @@ func (store *EtcdStore) GetPod(ctx context.Context, conf config.Pod) (string, er
 	// res, err := etcd.GetEtcd(ctx, store.client, res)
 	_, err := etcd.GetEtcd(ctx, store.Client, conf)
 	if err != nil {
-		fmt.Println(err)
+		utils.Log().Error("GetEtcd function return error", "err message", err)
 	}
 
 	// fmt.Println(res)

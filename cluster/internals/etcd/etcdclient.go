@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/tekluabayneh/gok8s/config"
+	"github.com/tekluabayneh/gok8s/utils"
 	"go.etcd.io/etcd/api/v3/v3rpc/rpctypes"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"google.golang.org/grpc/codes"
@@ -65,25 +66,25 @@ func DeleteEtcd(ctx context.Context, client *clientv3.Client, name string) (*cli
 
 func handlerEtcdError(err error) error {
 	if clientv3.IsConnCanceled(err) {
-		fmt.Println(err)
+		utils.Log().WithGroup("clientv3").Debug("clientv3 is not connected", "err", err)
 	}
 
 	if err != nil {
 		if clientv3.IsConnCanceled(err) {
-			fmt.Println("gRPC client connection is closed", err)
+			utils.Log().WithGroup("clientv3").Debug("gRPC client connection is closed", "err", err)
 		} else if err == context.Canceled {
-			fmt.Println("ctx is canceled by another routine", err)
+			utils.Log().WithGroup("clientv3").Debug("ctx is canceled by another routine", "err", err)
 		} else if err == context.DeadlineExceeded {
-			fmt.Println("ctx is attached with a deadline and it exceeded", err)
+			utils.Log().WithGroup("clientv3").Debug("ctx is attached with a deadline and it exceeded", "err", err)
 		} else if err == rpctypes.ErrEmptyKey {
-			fmt.Println("client-side error: key is not provided", err)
+			utils.Log().WithGroup("clientv3").Debug("client-side error: key is not provided", "err", err)
 		} else if ev, ok := status.FromError(err); ok {
 			code := ev.Code()
 			if code == codes.DeadlineExceeded {
-				fmt.Println("server-side context might have timed-out first (due to clock skew) while original client-side context is not timed-out yet", err)
+				utils.Log().WithGroup("clientv3").Debug("server-side context might have timed-out first (due to clock skew) while original client-side context is not timed-out yet", "err", err)
 			}
 		} else {
-			fmt.Println("bad cluster endpoints, which are not etcd servers", err)
+			utils.Log().WithGroup("clientv3").Debug("bad cluster endpoints, which are not etcd servers", "err", err)
 		}
 	}
 	return err
