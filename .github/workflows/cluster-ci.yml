@@ -5,36 +5,50 @@ on:
   pull_request:
 
 jobs:
-  test:
-    runs_on: ubuntu_latest
 
+  lint:
+    runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Run Linter
-        runs: echo "lint passed"
+      - name: RUN Lint
+        run: echo "lint passed"
 
+  build:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: RUN Build
+        run: echo "build passed"
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Run tests
-        runs: echo "Tests passed"
+        run: echo "Tests passed"
 
       - name: build application
-        runs: echo "application build passed"
+        run: echo "application build passed"
 
-docker:
-  needs:
-    - lint
-    - test
-    - build
+  docker:
+    needs:
+      - lint
+      - test
+      - build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
 
-  if: github.ref == "refs/heads/main"
-  runs_on: ubuntu_latest
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-  steps:
-
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    - name: Build docker image
-      runs: echo "Docker build passed"
+      - name: Build docker image
+        run: echo "Docker build passed"
