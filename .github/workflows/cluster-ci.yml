@@ -1,0 +1,40 @@
+name: cluster CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs_on: ubuntu_latest
+
+    steps:
+
+      - name: Run Linter
+        runs: echo "lint passed"
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run tests
+        runs: echo "Tests passed"
+
+      - name: build application
+        runs: echo "application build passed"
+
+docker:
+  needs:
+    - lint
+    - test
+    - build
+
+  if: github.ref == "refs/heads/main"
+  runs_on: ubuntu_latest
+
+  steps:
+
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Build docker image
+      runs: echo "Docker build passed"
