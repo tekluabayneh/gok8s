@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/tekluabayneh/gok8s/config"
+	"github.com/tekluabayneh/gok8s/Resconfig"
 	"github.com/tekluabayneh/gok8s/utils"
 	"go.etcd.io/etcd/api/v3/v3rpc/rpctypes"
 	clientv3 "go.etcd.io/etcd/client/v3"
@@ -13,7 +13,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func GetEtcd(ctx context.Context, client *clientv3.Client, conf config.Pod) (*clientv3.GetResponse, error) {
+func GetEtcd(ctx context.Context, client *clientv3.Client, conf Resconfig.Pod) (*clientv3.GetResponse, error) {
 	prefix := BuildKey(conf.Kind, conf.Metadata.Namespace, conf.Metadata.Name)
 	fmt.Println("prefix val\n", prefix)
 	// TODO
