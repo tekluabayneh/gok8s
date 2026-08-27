@@ -12,7 +12,8 @@
     "@oclif/plugin-help": "^6",
     "@oclif/plugin-plugins": "^5",
     "global": "^4.4.0",
-    "mykubectl": "link:"
+    "mykubectl": "link:",
+    "yaml": "^2.9.0"
   },
   "devDependencies": {
     "@eslint/compat": "^1",
@@ -63,7 +64,7 @@
   },
   "repository": "Kubectl/mykubectl",
   "scripts": {
-    "build": "shx rm -rf dist && tsc -b",
+    "build": "shx rm -rf dist && tsc -b && cp -r asset dist",
     "lint": "eslint",
     "postpack": "shx rm -f oclif.manifest.json",
     "posttest": "pnpm run lint",
