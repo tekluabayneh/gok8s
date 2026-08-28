@@ -95,6 +95,7 @@ func (d *DeltaFIFO) Add(EventKey, EvenKeyVal []byte, EventModeRevision int64) er
 func (d *DeltaFIFO) Update(EventKey, EvenKeyVal []byte, EventModeRevision int64) error {
 	d.lock.Lock()
 	defer d.lock.Unlock()
+
 	return d.queueActionInternalLocked(EventKey, EvenKeyVal, Updated)
 }
 
