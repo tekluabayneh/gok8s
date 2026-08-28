@@ -1,31 +1,34 @@
 import { parse } from "yaml"
 import fs from "fs"
+import chalk from "chalk";
 
-export const yamlToJson = async (Path: string): Promise<"" | JSON> => {
+export const yamlToJson = async (Path: string): Promise<void | JSON> => {
   try {
-    const RootDir = process.cwd()
-    fs.readFile(RootDir + Path, (error, file) => {
+    const FullPath = process.cwd() + Path
+    fs.stat(FullPath, (error, stats) => {
+
       if (error) {
-        console.error(`Path does not exist: ${Path}`);
+        console.error(chalk.red(`Path does not exist: ${Path}`));
         return
       }
 
-      if (file.length == 0) {
-        console.error(`File is empty: ${Path}`);
-        return;
-      }
 
-      const yaml = fs.readFileSync(RootDir + Path, "utf-8")
-      const jsonFile = parse(yaml)
-      return jsonFile
+      if (stats.isFile()) {
+        if (stats.size == 0) {
+          console.error(chalk.yellow("empty files"));
+          return
+        }
+
+      }
     })
-    return ""
+
+    const yaml = fs.readFileSync(FullPath, "utf-8")
+    const jsonFile = parse(yaml)
+    return jsonFile
   } catch (error) {
-    console.log(error)
-    return ""
+    console.error(chalk.red(`Path does not exist: ${Path}`));
   }
 }
-
 
 
 

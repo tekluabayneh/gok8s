@@ -1,5 +1,6 @@
 import { Command, Flags } from '@oclif/core'
 import { yamlToJson } from '../../utils/yamlToJson.js'
+import chalk from 'chalk'
 
 
 export default class Pods extends Command {
@@ -51,7 +52,9 @@ export default class Pods extends Command {
     }
 
     if (filename[0] == "/") {
-      console.log("you must path valid file name")
+      // console.log("you must path valid file name")
+      this.warn(chalk.yellow("you must path valid file name"))
+
       return
     }
 
@@ -64,20 +67,4 @@ export default class Pods extends Command {
 }
 
 
-// Arguments / flags — what the user explicitly provides.
-// Resource body/data — the object or configuration being created/modified.
-// User identity / privileges — who is making the request and what they are allowed to do.
-// Namespace — the Kubernetes namespace in which the resource operates.
-// Cluster/context — which cluster the command is targeting.
-// Authentication credentials — how the client proves its identity.
-// API server address — where the Kubernetes API server is.
-// Configuration — usually the kubeconfig/context that ties cluster + user + credentials together.
-// Resource type/name — e.g. Pod and its name.
-// Request metadata — things such as HTTP headers/content type where relevant.
-// Output preferences — e.g. normal output, YAML, JSON, wide output, etc.
-// Validation/defaulting — values the CLI needs to validate or fill in before making the request.
-//
-// But don't treat all of these as things every command receives directly.
-//
-// // i have to taken core of auth too 
 
