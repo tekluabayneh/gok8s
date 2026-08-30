@@ -24,6 +24,7 @@ export const yamlToJson = async (Path: string): Promise<void | JSON> => {
 
     const yaml = fs.readFileSync(FullPath, "utf-8")
     const jsonFile = parse(yaml)
+
     return jsonFile
   } catch (error) {
     console.error(chalk.red(`Path does not exist: ${Path}`));

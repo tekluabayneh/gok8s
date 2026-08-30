@@ -1,6 +1,7 @@
 import { Command, Flags } from '@oclif/core'
 import { yamlToJson } from '../../utils/yamlToJson.js'
 import chalk from 'chalk'
+import api from '../../client/client.js'
 
 
 export default class Pods extends Command {
@@ -46,13 +47,13 @@ export default class Pods extends Command {
     // const res = await fetch("")
     // const data = await res.json()
     // console.log(data)
+
     console.log("filename", filename)
+
     if (!filename) {
       return
     }
-
     if (filename[0] == "/") {
-      // console.log("you must path valid file name")
       this.warn(chalk.yellow("you must path valid file name"))
 
       return
@@ -62,9 +63,13 @@ export default class Pods extends Command {
     console.log("json file", jsonfile)
     console.log("namespace", namespace)
     // console.log(filename, namespace, output, context, kubeconfig)
+    api.get("one")
   }
 
 }
+
+
+
 
 
 
