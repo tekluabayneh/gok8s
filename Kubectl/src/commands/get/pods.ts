@@ -1,6 +1,4 @@
 import { Command, Flags } from '@oclif/core'
-import { yamlToJson } from '../../utils/yamlToJson.js'
-import chalk from 'chalk'
 import api from '../../client/client.js'
 
 
@@ -18,7 +16,7 @@ export default class Pods extends Command {
     sortBy: Flags.string({ description: 'sort list using a jsonpath expression', required: false }),
     noHeaders: Flags.boolean({ description: 'omit headers from the output', required: false }),
     ignoreNotFound: Flags.boolean({ description: 'treat "resource not found" as a successful exit', required: false }),
-    filename: Flags.string({ char: 'f', description: 'file, directory, or URL to identify resources', required: false, multiple: true }),
+    filename: Flags.string({ char: 'f', description: 'file, directory, or URL to identify resources', required: false, multiple: false }),
     kustomize: Flags.string({ char: 'k', description: 'process a kustomization directory', required: false }),
     recursive: Flags.boolean({ char: 'R', description: 'process the directory used in -f recursively', required: false }),
     chunkSize: Flags.integer({ description: 'batch size for large list requests', required: false }),
@@ -30,40 +28,12 @@ export default class Pods extends Command {
   }
   async run(): Promise<void> {
     const { flags } = await this.parse(Pods)
-    const { filename, namespace, output, context, kubeconfig } = flags
-    // TODO 
-    // implement create pod method 
-    // if (namespace == "default") {
-    // api will use 
-    // }
-    // "body"{ 
-    //  "namespace": namespace
-    //  }
-    // instade of using if statment just use waht ever you got not if statment this is soemthing you can pass like in the json body of api
-
-
-
-    // console.log("") // get the the apiServer Base url from conf or someware not from here
-    // const res = await fetch("")
-    // const data = await res.json()
-    // console.log(data)
-
-    console.log("filename", filename)
-
-    if (!filename) {
-      return
+    const { namespace } = flags
+    const res = await api.get(`/api/v1/namespaces/${namespace ?? "default"}/pods`)
+    console.log("res", res.data)
+    if (res.data.items.length == 0) {
+      console.log(`no resource are found in the ${namespace ?? "default"} namespace`)
     }
-    if (filename[0] == "/") {
-      this.warn(chalk.yellow("you must path valid file name"))
-
-      return
-    }
-
-    const jsonfile = await yamlToJson(filename[0])
-    console.log("json file", jsonfile)
-    console.log("namespace", namespace)
-    // console.log(filename, namespace, output, context, kubeconfig)
-    api.get("one")
   }
 
 }
