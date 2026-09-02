@@ -1,4 +1,3 @@
-import { runCommand } from '@oclif/test'
 import { expect } from 'chai'
 
 describe('hello', () => {
