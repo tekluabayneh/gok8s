@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "declaration": true,
-    "module": "Node16",
+    "module": "node16",
     "outDir": "dist",
     "rootDir": "src",
     "strict": true,
@@ -9,7 +9,7 @@
     "moduleResolution": "node16"
   },
   "include": [
-    "./src/**/*",
+    "./src/**/*"
   ],
   "ts-node": {
     "esm": true

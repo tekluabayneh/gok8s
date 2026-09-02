@@ -1,7 +1,7 @@
 import axios from "axios"
 import os from "node:os"
 
-import KubectlconfigType from "../../types/configtypes.d.js"
+import type KubectlconfigType from "../../types/configtypes.d.js"
 import { yamlToJson } from "../utils/yaml-to-json.js"
 
 import chalk from "chalk"
