@@ -1,8 +1,10 @@
 import { Command, Flags } from '@oclif/core'
+import { yamlToJson } from '../../utils/yaml-to-json.js'
 import api from '../../client/client.js'
+import chalk from 'chalk'
 
 
-export default class Pods extends Command {
+export default class Pod extends Command {
   static flags = {
     namespace: Flags.string({ char: 'n', description: 'namespace scope for this request', required: false }),
     allNamespaces: Flags.boolean({ char: 'A', description: 'list the requested object(s) across all namespaces', required: false }),
@@ -16,7 +18,7 @@ export default class Pods extends Command {
     sortBy: Flags.string({ description: 'sort list using a jsonpath expression', required: false }),
     noHeaders: Flags.boolean({ description: 'omit headers from the output', required: false }),
     ignoreNotFound: Flags.boolean({ description: 'treat "resource not found" as a successful exit', required: false }),
-    filename: Flags.string({ char: 'f', description: 'file, directory, or URL to identify resources', required: false, multiple: false }),
+    filename: Flags.string({ char: 'f', description: 'file, directory, or URL to identify resources', required: true, multiple: false }),
     kustomize: Flags.string({ char: 'k', description: 'process a kustomization directory', required: false }),
     recursive: Flags.boolean({ char: 'R', description: 'process the directory used in -f recursively', required: false }),
     chunkSize: Flags.integer({ description: 'batch size for large list requests', required: false }),
@@ -27,15 +29,20 @@ export default class Pods extends Command {
     kubeconfig: Flags.string({ description: 'path to the kubeconfig file to use', required: false }),
   }
 
-
   async run(): Promise<void> {
-    const { flags } = await this.parse(Pods)
-    const { namespace } = flags
-    const res = await api.get(`/api/v1/namespaces/${namespace ?? "default"}/pods`)
-    console.log("res", res.data)
-    if (res.data.items.length === 0) {
-      console.log(`no resource are found in the ${namespace ?? "default"} namespace`)
+    const { flags } = await this.parse(Pod)
+    const { filename } = flags
+
+    if (!filename) {
+      this.warn(chalk.yellow("you must path valid file name"))
+      return
     }
+
+    const RootPath = process.cwd() + filename
+
+    const jsonfile = await yamlToJson(RootPath)
+    const res = await api.post("/api/v1/namespaces/default/pods", { jsonfile }) // body need to be checked
+    console.log("res", res.data)
   }
 
 }
