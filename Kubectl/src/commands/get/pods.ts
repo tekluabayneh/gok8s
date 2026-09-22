@@ -1,8 +1,11 @@
 import { Command, Flags } from '@oclif/core'
 import api from '../../client/client.js'
-
-
+import axios from 'axios'
+import chalk from 'chalk'
+import renderToTerminal from '../../utils/Render-to-terminal.js'
+import type { RsPodtype } from '../../../types/configtypes.js'
 export default class Pods extends Command {
+  static aliases = ['get:pod']
   static flags = {
     namespace: Flags.string({ char: 'n', description: 'namespace scope for this request', required: false }),
     allNamespaces: Flags.boolean({ char: 'A', description: 'list the requested object(s) across all namespaces', required: false }),
@@ -31,17 +34,28 @@ export default class Pods extends Command {
   async run(): Promise<void> {
     const { flags } = await this.parse(Pods)
     const { namespace } = flags
-    const res = await api.get(`/api/v1/namespaces/${namespace ?? "default"}/pods`)
-    console.log("res", res.data)
-    if (res.data.items.length === 0) {
-      console.log(`no resource are found in the ${namespace ?? "default"} namespace`)
+
+    try {
+      const res = await api.get(`/api/v1/namespaces/${namespace ?? "default"}/pods`)
+      //TODO: 
+      //this renderToTerminal function should be flexable enough to for all of terminal render things 
+      // console.dir(res.data.items, { depth: null })
+
+      renderToTerminal(res.data.items, "Pod")
+      if (res.data.items.length === 0) {
+        console.log(`no resource are found in the ${namespace ?? "default"} namespace`)
+      }
+
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.log(error.response?.data.message)
+      } else {
+        console.log(chalk.red("something went wrong", error))
+      }
     }
+
   }
 
 }
-
-
-
-
 
 
