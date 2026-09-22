@@ -1,7 +1,8 @@
 import axios from "axios"
 import os from "node:os"
 
-import type KubectlconfigType from "../../types/configtypes.d.js"
+import type { KubectlconfigType } from "../../types/configtypes.d.js"
+
 import { yamlToJson } from "../utils/yaml-to-json.js"
 
 import chalk from "chalk"
@@ -119,6 +120,7 @@ api.interceptors.request.use(async (config) => {
 
   return config;
 }, (error) => {
+  console.log(error)
   return Promise.reject(error);
 });
 
