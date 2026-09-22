@@ -15,6 +15,7 @@
     "chalk": "^6.0.0",
     "global": "^4.4.0",
     "mykubectl": "link:",
+    "table": "^6.9.0",
     "yaml": "^2.9.0"
   },
   "devDependencies": {
