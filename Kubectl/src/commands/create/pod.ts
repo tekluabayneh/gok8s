@@ -2,6 +2,8 @@ import { Command, Flags } from '@oclif/core'
 import { yamlToJson } from '../../utils/yaml-to-json.js'
 import api from '../../client/client.js'
 import chalk from 'chalk'
+import axios from 'axios'
+import { table } from "table"
 
 
 export default class Pod extends Command {
@@ -29,20 +31,39 @@ export default class Pod extends Command {
     kubeconfig: Flags.string({ description: 'path to the kubeconfig file to use', required: false }),
   }
 
+  //FIRE: 
+  //identify or learn what apply and create command do do they differ or same and if they are the same can i just put one as alias 
+  //
+  //HOT: 
+  //get files and maker sure files are not empty 
+  //convert to json 
+  //send to 
+  //show the relevent message to usr
+  // identify what are the falgs reqruired beside -f in createing or applying for pods 
   async run(): Promise<void> {
     const { flags } = await this.parse(Pod)
-    const { filename } = flags
+    const { filename, namespace } = flags
 
-    if (!filename) {
-      this.warn(chalk.yellow("you must path valid file name"))
-      return
+
+    try {
+      if (!filename) {
+        this.warn(chalk.yellow("you must path valid file name"))
+        return
+      }
+
+      const RootPath = process.cwd() + filename
+
+      const jsonfile = await yamlToJson(RootPath)
+      const res = await api.post(`/api/v1/namespaces/${namespace ?? "default"}/pods`, jsonfile)
+      console.log("res", res.data)
+      //HOT: this reponse types need to be fixed not console log but as the real kubect does it reponse with table type response 
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.log(error.response?.data?.message)
+      } else {
+        console.log(chalk.red("something went wrong"))
+      }
     }
-
-    const RootPath = process.cwd() + filename
-
-    const jsonfile = await yamlToJson(RootPath)
-    const res = await api.post("/api/v1/namespaces/default/pods", { jsonfile }) // body need to be checked
-    console.log("res", res.data)
   }
 
 }
