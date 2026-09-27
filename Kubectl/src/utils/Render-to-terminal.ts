@@ -1,10 +1,12 @@
 import { table } from "table";
 import type { RsPodtype } from "../../types/configtypes.js";
+import type { Node as NodeResType } from "../../types/node.js";
 
 type ResourceMap = {
   Pod: RsPodtype[],
-  Deployment: RsPodtype[]
-  Namespace: RsPodtype[]
+  Deployment: RsPodtype[],
+  Namespace: RsPodtype[],
+  Node: NodeResType[],
 }
 
 
@@ -50,26 +52,38 @@ const renderToTerminal = <T extends keyof ResourceMap>(data: ResourceMap[T], Res
 
   switch (ResType) {
     case "Pod":
+      //@ts-ignore
       RenderPod(data)
       return
     case "Deployment":
+      //@ts-ignore
       RenderDep(data)
       return
     case "Namespace":
+      //@ts-ignore
       Namespace(data)
+      return
+    case "Node":
+      //@ts-ignore
+      NodeRes(data)
       return
     default:
       console.log("dfault logs")
   }
 }
 
+
+//HOT:
+//i have to fix the sing pod rendering problem 
+
 const RenderPod = (data: RsPodtype[]) => {
   const tableData = [
     ['NAME', 'REDY', 'STATUS', "RESTART", "AGE"],
-    ...data?.map((item) => [item?.metadata?.name, `${Number(item.status.containerStatuses[0].ready)}/${item?.spec.containers.length}`, item?.status.containerStatuses[0].state.waiting?.reason ?? item?.status?.containerStatuses[0].state?.terminated?.reason ?? item?.status?.phase, item?.status?.containerStatuses[0].restartCount,
+    ...data?.map((item) => [item?.metadata?.name, `${Number(item.status.containerStatuses[0].ready)}/${item?.spec.containers?.length}`, item.metadata?.deletionTimestamp ? "terminating" : (item?.status.containerStatuses[0].state.waiting?.reason ?? item?.status?.containerStatuses[0].state?.terminated?.reason ?? item?.status?.phase), item?.status?.containerStatuses[0].restartCount,
     getAge(item?.metadata?.creationTimestamp)
     ])
   ];
+
   console.log(table(tableData))
 }
 
@@ -85,9 +99,33 @@ const Namespace = (data: RsPodtype[]) => {
   ];
 
   console.log(table(tableData))
-
-
 }
 
+const NodeRes = (data: NodeResType[]) => {
+
+  const getNodeRoles = (item: NodeResType) => {
+    let lables = item?.metadata?.labels
+    let label = ""
+    for (const it in lables) {
+      if (it == "node-role.kubernetes.io/control-plane") {
+        label = it.split("/")[1]
+      }
+    }
+
+    return label
+  }
+  const tableData = [
+    ['NAME', 'STATUS', 'ROLES', "AGE", 'VERSION'],
+    ...data?.map((item) => [
+      item?.metadata?.name,
+      item.status?.conditions[item.status.conditions.length - 1].type,
+      getNodeRoles(item)?.length > 0 ? getNodeRoles(item) : "<none>",
+      getAge(item?.metadata?.creationTimestamp),
+      item?.status?.nodeInfo?.kubeletVersion,
+    ])
+  ];
+  console.log(table(tableData))
+
+}
 
 export default renderToTerminal

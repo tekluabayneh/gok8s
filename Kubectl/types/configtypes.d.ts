@@ -63,6 +63,7 @@ export type RsPodtype = {
     resourceVersion: string
     generation: number,
     creationTimestamp: string
+    deletionTimestamp?: string
     labels: {},
     managedFields: []
   },

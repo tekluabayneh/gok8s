@@ -2,14 +2,14 @@ import { Args, Command, Flags } from '@oclif/core'
 import api from '../../client/client.js'
 import axios from 'axios'
 import chalk from 'chalk'
-import renderToTerminal from '../../utils/Render-to-terminal.js'
-export default class Namespace extends Command {
-  static aliases = ['get:ns']
+
+
+export default class DelNamespace extends Command {
+  static aliases = ['delete:ns']
   static strict = false
   static args = {
-    nsName: Args.string(),
+    podName: Args.string(),
   }
-
   static flags = {
     namespace: Flags.string({ char: 'n', description: 'namespace scope for this request', required: false }),
     allNamespaces: Flags.boolean({ char: 'A', description: 'list the requested object(s) across all namespaces', required: false }),
@@ -36,30 +36,29 @@ export default class Namespace extends Command {
 
 
   async run(): Promise<void> {
-    const { argv, flags } = await this.parse(Namespace)
+    const { argv, flags } = await this.parse(DelNamespace)
+    const { args } = await this.parse(DelNamespace)
     const { namespace } = flags
 
+    if (argv.length < 1) {
+      console.log(chalk.red("at list one resouce name is requied"))
+      return
+    }
+
     try {
+      for (let i = 0; i < argv.length; i++) {
+        const res = await api.delete(`/api/v1/namespaces/${argv[i]}`)
 
-      if (argv.length > 0) {
-        for (let i = 0; i < argv.length; i++) {
-          const res = await api.get(`/api/v1/namespaces/${argv[i]}`)
-
-          renderToTerminal(res.data.items ?? [res.data], "Namespace")
-
-          if (res.data.items?.length === 0) {
-            console.log(`no resource are found in the ${namespace ?? "default"} namespace`)
-          }
-
+        if (res.status == 404) {
+          console.log(`no resource are found in the ${namespace ?? "default"} namespace`)
         }
-        return
+
+
+        if (res.status == 200) {
+          console.log(`namespce "${args.podName}" deleted `)
+        }
       }
 
-      const res = await api.get(`/api/v1/namespaces/`)
-      renderToTerminal(res.data.items ?? [res.data], "Namespace")
-      if (res.data.items.length === 0) {
-        console.log(`no resource are found in the ${namespace ?? "default"} namespace`)
-      }
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.log(error.response?.data.message)

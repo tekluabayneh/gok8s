@@ -1,15 +1,18 @@
+
 import { Args, Command, Flags } from '@oclif/core'
+import { yamlToJson } from '../../utils/yaml-to-json.js'
 import api from '../../client/client.js'
-import axios from 'axios'
 import chalk from 'chalk'
-import renderToTerminal from '../../utils/Render-to-terminal.js'
+import axios from 'axios'
+import { table } from "table"
+
+
 export default class Namespace extends Command {
-  static aliases = ['get:ns']
+  static aliases = ['create:ns']
   static strict = false
   static args = {
-    nsName: Args.string(),
+    nameOfNs: Args.string()
   }
-
   static flags = {
     namespace: Flags.string({ char: 'n', description: 'namespace scope for this request', required: false }),
     allNamespaces: Flags.boolean({ char: 'A', description: 'list the requested object(s) across all namespaces', required: false }),
@@ -34,42 +37,40 @@ export default class Namespace extends Command {
     kubeconfig: Flags.string({ description: 'path to the kubeconfig file to use', required: false }),
   }
 
-
   async run(): Promise<void> {
-    const { argv, flags } = await this.parse(Namespace)
-    const { namespace } = flags
+    const { args, flags } = await this.parse(Namespace)
+    const { filename } = flags
 
     try {
 
-      if (argv.length > 0) {
-        for (let i = 0; i < argv.length; i++) {
-          const res = await api.get(`/api/v1/namespaces/${argv[i]}`)
-
-          renderToTerminal(res.data.items ?? [res.data], "Namespace")
-
-          if (res.data.items?.length === 0) {
-            console.log(`no resource are found in the ${namespace ?? "default"} namespace`)
-          }
-
+      if (filename) {
+        const RootPath = process.cwd() + filename
+        const jsonfile = await yamlToJson(RootPath)
+        const res = await api.post(`/api/v1/namespaces`, jsonfile)
+        if (res.data.status.phase == "Active") {
+          console.log(chalk.green(`namespace/${args.nameOfNs} creared`))
         }
+
         return
       }
-
-      const res = await api.get(`/api/v1/namespaces/`)
-      renderToTerminal(res.data.items ?? [res.data], "Namespace")
-      if (res.data.items.length === 0) {
-        console.log(`no resource are found in the ${namespace ?? "default"} namespace`)
+      const res = await api.post(`/api/v1/namespaces`, { metadata: { name: args.nameOfNs } })
+      if (res.data.status.phase == "Active") {
+        console.log(chalk.green(`namespace/${args.nameOfNs} creared`))
       }
+
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        console.log(error.response?.data.message)
+        console.log(error.response?.data?.message)
       } else {
-        console.log(chalk.red("something went wrong", error))
+        console.log(chalk.red("something went wrong"))
       }
     }
-
   }
 
 }
+
+
+
+
 
 
