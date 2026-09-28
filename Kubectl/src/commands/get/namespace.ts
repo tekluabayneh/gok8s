@@ -2,7 +2,7 @@ import { Args, Command, Flags } from '@oclif/core'
 import api from '../../client/client.js'
 import axios from 'axios'
 import chalk from 'chalk'
-import renderToTerminal from '../../utils/Render-to-terminal.js'
+import renderToTerminal from '../../utils/render-to-terminal.js'
 export default class Namespace extends Command {
   static aliases = ['get:ns']
   static args = {
@@ -31,7 +31,7 @@ export default class Namespace extends Command {
     context: Flags.string({ description: 'name of the kubeconfig context to use', required: false }),
     kubeconfig: Flags.string({ description: 'path to the kubeconfig file to use', required: false }),
   }
-static strict = false
+  static strict = false
 
 
   async run(): Promise<void> {

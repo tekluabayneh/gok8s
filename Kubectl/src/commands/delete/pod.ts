@@ -48,12 +48,12 @@ export default class DelPods extends Command {
       for (const element of argv) {
         const res = await api.delete(`/api/v1/namespaces/${namespace ?? "default"}/pods/${element}`)
 
-        if (res.status == 404) {
+        if (res.status === 404) {
           console.log(`no resource are found in the ${namespace ?? "default"} namespace`)
         }
 
 
-        if (res.status == 200) {
+        if (res.status === 200) {
           console.log(`pod "${args.podName}" deleted from ${namespace ?? "default"} namespace `)
         }
       }

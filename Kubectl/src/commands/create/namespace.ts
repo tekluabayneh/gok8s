@@ -46,7 +46,7 @@ export default class Namespace extends Command {
         const RootPath = process.cwd() + filename
         const jsonfile = await yamlToJson(RootPath)
         const res = await api.post(`/api/v1/namespaces`, jsonfile)
-        if (res.data.status.phase == "Active") {
+        if (res.data.status.phase === "Active") {
           console.log(chalk.green(`namespace/${args.nameOfNs} creared`))
         }
 
@@ -54,7 +54,7 @@ export default class Namespace extends Command {
       }
 
       const res = await api.post(`/api/v1/namespaces`, { metadata: { name: args.nameOfNs } })
-      if (res.data.status.phase == "Active") {
+      if (res.data.status.phase === "Active") {
         console.log(chalk.green(`namespace/${args.nameOfNs} creared`))
       }
 

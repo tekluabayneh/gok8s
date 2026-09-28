@@ -3,7 +3,6 @@ import { yamlToJson } from '../../utils/yaml-to-json.js'
 import api from '../../client/client.js'
 import chalk from 'chalk'
 import axios from 'axios'
-import { table } from "table"
 
 
 export default class Pod extends Command {

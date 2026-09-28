@@ -19,7 +19,8 @@ export default [
       'perfectionist/sort-imports': 'off',
       'perfectionist/sort-objects': 'off',
       'perfectionist/sort-object-types': 'off',
-
+      'no-warning-comments': 'off',
+      '@typescript-eslint/no-empty-object-type': 'off',
       "perfectionist/sort-interfaces": "off",
 
       // Don't enforce this stylistic preference

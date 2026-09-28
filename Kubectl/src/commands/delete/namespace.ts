@@ -49,12 +49,12 @@ export default class DelNamespace extends Command {
       for (const element of argv) {
         const res = await api.delete(`/api/v1/namespaces/${element}`)
 
-        if (res.status == 404) {
+        if (res.status === 404) {
           console.log(`no resource are found in the ${namespace ?? "default"} namespace`)
         }
 
 
-        if (res.status == 200) {
+        if (res.status === 200) {
           console.log(`namespce "${args.podName}" deleted `)
         }
       }

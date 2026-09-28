@@ -2,7 +2,7 @@ import { Args, Command, Flags } from '@oclif/core'
 import api from '../../client/client.js'
 import axios from 'axios'
 import chalk from 'chalk'
-import renderToTerminal from '../../utils/Render-to-terminal.js'
+import renderToTerminal from '../../utils/render-to-terminal.js'
 
 
 export default class Pods extends Command {
@@ -39,6 +39,8 @@ export default class Pods extends Command {
     const { args, flags } = await this.parse(Pods)
     const { namespace } = flags
 
+    // TODO: 
+    // change the iterating with Promise.ALL instade of just using this one which also raise lint error
 
     try {
       const namePart = args.podName ? "/" + args.podName : ""
