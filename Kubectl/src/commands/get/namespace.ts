@@ -3,12 +3,10 @@ import api from '../../client/client.js'
 import axios from 'axios'
 import chalk from 'chalk'
 import renderToTerminal from '../../utils/render-to-terminal.js'
-
-
-export default class Pods extends Command {
-  static aliases = ['get:pod']
+export default class Namespace extends Command {
+  static aliases = ['get:ns']
   static args = {
-    podName: Args.string(),
+    nsName: Args.string(),
   }
   static flags = {
     namespace: Flags.string({ char: 'n', description: 'namespace scope for this request', required: false }),
@@ -33,24 +31,35 @@ export default class Pods extends Command {
     context: Flags.string({ description: 'name of the kubeconfig context to use', required: false }),
     kubeconfig: Flags.string({ description: 'path to the kubeconfig file to use', required: false }),
   }
+  static strict = false
 
 
   async run(): Promise<void> {
-    const { args, flags } = await this.parse(Pods)
+    const { argv, flags } = await this.parse(Namespace)
     const { namespace } = flags
 
-    // TODO: 
-    // change the iterating with Promise.ALL instade of just using this one which also raise lint error
-
     try {
-      const namePart = args.podName ? "/" + args.podName : ""
-      const res = await api.get(`/api/v1/namespaces/${namespace ?? "default"}/pods${namePart}`)
-      renderToTerminal(res.data.items ?? [res.data], "Pod")
 
-      if (res.data.item ? res.data.items?.length === 0 : false) {
-        console.log(`no resource are found in the ${namespace ?? "default"} namespace`)
+      if (argv.length > 0) {
+        for (const element of argv) {
+          const res = await api.get(`/api/v1/namespaces/${element}`)
+
+          renderToTerminal(res.data.items ?? [res.data], "Namespace")
+
+          if (res.data.items?.length === 0) {
+            console.log(`no resource are found in the ${namespace ?? "default"} namespace`)
+          }
+
+        }
+
+        return
       }
 
+      const res = await api.get(`/api/v1/namespaces/`)
+      renderToTerminal(res.data.items ?? [res.data], "Namespace")
+      if (res.data.items.length === 0) {
+        console.log(`no resource are found in the ${namespace ?? "default"} namespace`)
+      }
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.log(error.response?.data.message)

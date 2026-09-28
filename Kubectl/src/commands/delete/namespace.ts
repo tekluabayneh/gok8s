@@ -2,11 +2,10 @@ import { Args, Command, Flags } from '@oclif/core'
 import api from '../../client/client.js'
 import axios from 'axios'
 import chalk from 'chalk'
-import renderToTerminal from '../../utils/render-to-terminal.js'
 
 
-export default class Pods extends Command {
-  static aliases = ['get:pod']
+export default class DelNamespace extends Command {
+  static aliases = ['delete:ns']
   static args = {
     podName: Args.string(),
   }
@@ -33,22 +32,31 @@ export default class Pods extends Command {
     context: Flags.string({ description: 'name of the kubeconfig context to use', required: false }),
     kubeconfig: Flags.string({ description: 'path to the kubeconfig file to use', required: false }),
   }
+  static strict = false
 
 
   async run(): Promise<void> {
-    const { args, flags } = await this.parse(Pods)
+    const { argv, flags } = await this.parse(DelNamespace)
+    const { args } = await this.parse(DelNamespace)
     const { namespace } = flags
 
-    // TODO: 
-    // change the iterating with Promise.ALL instade of just using this one which also raise lint error
+    if (argv.length === 0) {
+      console.log(chalk.red("at list one resouce name is requied"))
+      return
+    }
 
     try {
-      const namePart = args.podName ? "/" + args.podName : ""
-      const res = await api.get(`/api/v1/namespaces/${namespace ?? "default"}/pods${namePart}`)
-      renderToTerminal(res.data.items ?? [res.data], "Pod")
+      for (const element of argv) {
+        const res = await api.delete(`/api/v1/namespaces/${element}`)
 
-      if (res.data.item ? res.data.items?.length === 0 : false) {
-        console.log(`no resource are found in the ${namespace ?? "default"} namespace`)
+        if (res.status === 404) {
+          console.log(`no resource are found in the ${namespace ?? "default"} namespace`)
+        }
+
+
+        if (res.status === 200) {
+          console.log(`namespce "${args.podName}" deleted `)
+        }
       }
 
     } catch (error) {

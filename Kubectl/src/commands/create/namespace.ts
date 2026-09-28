@@ -1,14 +1,15 @@
+
 import { Args, Command, Flags } from '@oclif/core'
+import { yamlToJson } from '../../utils/yaml-to-json.js'
 import api from '../../client/client.js'
-import axios from 'axios'
 import chalk from 'chalk'
-import renderToTerminal from '../../utils/render-to-terminal.js'
+import axios from 'axios'
 
 
-export default class Pods extends Command {
-  static aliases = ['get:pod']
+export default class Namespace extends Command {
+  static aliases = ['create:ns']
   static args = {
-    podName: Args.string(),
+    nameOfNs: Args.string()
   }
   static flags = {
     namespace: Flags.string({ char: 'n', description: 'namespace scope for this request', required: false }),
@@ -33,34 +34,43 @@ export default class Pods extends Command {
     context: Flags.string({ description: 'name of the kubeconfig context to use', required: false }),
     kubeconfig: Flags.string({ description: 'path to the kubeconfig file to use', required: false }),
   }
-
+  static strict = false
 
   async run(): Promise<void> {
-    const { args, flags } = await this.parse(Pods)
-    const { namespace } = flags
-
-    // TODO: 
-    // change the iterating with Promise.ALL instade of just using this one which also raise lint error
+    const { args, flags } = await this.parse(Namespace)
+    const { filename } = flags
 
     try {
-      const namePart = args.podName ? "/" + args.podName : ""
-      const res = await api.get(`/api/v1/namespaces/${namespace ?? "default"}/pods${namePart}`)
-      renderToTerminal(res.data.items ?? [res.data], "Pod")
 
-      if (res.data.item ? res.data.items?.length === 0 : false) {
-        console.log(`no resource are found in the ${namespace ?? "default"} namespace`)
+      if (filename) {
+        const RootPath = process.cwd() + filename
+        const jsonfile = await yamlToJson(RootPath)
+        const res = await api.post(`/api/v1/namespaces`, jsonfile)
+        if (res.data.status.phase === "Active") {
+          console.log(chalk.green(`namespace/${args.nameOfNs} creared`))
+        }
+
+        return
+      }
+
+      const res = await api.post(`/api/v1/namespaces`, { metadata: { name: args.nameOfNs } })
+      if (res.data.status.phase === "Active") {
+        console.log(chalk.green(`namespace/${args.nameOfNs} creared`))
       }
 
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        console.log(error.response?.data.message)
+        console.log(error.response?.data?.message)
       } else {
-        console.log(chalk.red("something went wrong", error))
+        console.log(chalk.red("something went wrong"))
       }
     }
-
   }
 
 }
+
+
+
+
 
 
