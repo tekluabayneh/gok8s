@@ -5,11 +5,9 @@ import chalk from 'chalk'
 import renderToTerminal from '../../utils/Render-to-terminal.js'
 export default class Namespace extends Command {
   static aliases = ['get:ns']
-  static strict = false
   static args = {
     nsName: Args.string(),
   }
-
   static flags = {
     namespace: Flags.string({ char: 'n', description: 'namespace scope for this request', required: false }),
     allNamespaces: Flags.boolean({ char: 'A', description: 'list the requested object(s) across all namespaces', required: false }),
@@ -33,6 +31,7 @@ export default class Namespace extends Command {
     context: Flags.string({ description: 'name of the kubeconfig context to use', required: false }),
     kubeconfig: Flags.string({ description: 'path to the kubeconfig file to use', required: false }),
   }
+static strict = false
 
 
   async run(): Promise<void> {
@@ -42,8 +41,8 @@ export default class Namespace extends Command {
     try {
 
       if (argv.length > 0) {
-        for (let i = 0; i < argv.length; i++) {
-          const res = await api.get(`/api/v1/namespaces/${argv[i]}`)
+        for (const element of argv) {
+          const res = await api.get(`/api/v1/namespaces/${element}`)
 
           renderToTerminal(res.data.items ?? [res.data], "Namespace")
 
@@ -52,6 +51,7 @@ export default class Namespace extends Command {
           }
 
         }
+
         return
       }
 

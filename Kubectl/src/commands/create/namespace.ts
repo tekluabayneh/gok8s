@@ -4,12 +4,10 @@ import { yamlToJson } from '../../utils/yaml-to-json.js'
 import api from '../../client/client.js'
 import chalk from 'chalk'
 import axios from 'axios'
-import { table } from "table"
 
 
 export default class Namespace extends Command {
   static aliases = ['create:ns']
-  static strict = false
   static args = {
     nameOfNs: Args.string()
   }
@@ -36,6 +34,7 @@ export default class Namespace extends Command {
     context: Flags.string({ description: 'name of the kubeconfig context to use', required: false }),
     kubeconfig: Flags.string({ description: 'path to the kubeconfig file to use', required: false }),
   }
+  static strict = false
 
   async run(): Promise<void> {
     const { args, flags } = await this.parse(Namespace)
@@ -53,6 +52,7 @@ export default class Namespace extends Command {
 
         return
       }
+
       const res = await api.post(`/api/v1/namespaces`, { metadata: { name: args.nameOfNs } })
       if (res.data.status.phase == "Active") {
         console.log(chalk.green(`namespace/${args.nameOfNs} creared`))

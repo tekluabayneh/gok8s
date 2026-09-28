@@ -7,7 +7,6 @@ import renderToTerminal from '../../utils/Render-to-terminal.js'
 
 export default class Nodes extends Command {
   static aliases = ['get:nodes']
-  static strict: boolean = false
   static args = {
     podName: Args.string(),
   }
@@ -34,6 +33,7 @@ export default class Nodes extends Command {
     context: Flags.string({ description: 'name of the kubeconfig context to use', required: false }),
     kubeconfig: Flags.string({ description: 'path to the kubeconfig file to use', required: false }),
   }
+  static strict: boolean = false
 
 
   async run(): Promise<void> {
@@ -41,8 +41,8 @@ export default class Nodes extends Command {
 
     try {
       if (argv.length > 0) {
-        for (let i = 0; i < argv.length; i++) {
-          const res = await api.get(`/api/v1/nodes/${argv[i]}`)
+        for (const element of argv) {
+          const res = await api.get(`/api/v1/nodes/${element}`)
 
           renderToTerminal(res.data.items ?? [res.data], "Node")
 
@@ -51,6 +51,7 @@ export default class Nodes extends Command {
           }
 
         }
+
         return
       }
 

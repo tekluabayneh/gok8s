@@ -36,7 +36,7 @@ export default class Pods extends Command {
 
 
   async run(): Promise<void> {
-    const { args, argv, flags } = await this.parse(Pods)
+    const { args, flags } = await this.parse(Pods)
     const { namespace } = flags
 
 

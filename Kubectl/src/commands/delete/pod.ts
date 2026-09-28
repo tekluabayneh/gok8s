@@ -5,7 +5,6 @@ import chalk from 'chalk'
 
 
 export default class DelPods extends Command {
-  static strict = false
   static args = {
     podName: Args.string(),
   }
@@ -32,6 +31,7 @@ export default class DelPods extends Command {
     context: Flags.string({ description: 'name of the kubeconfig context to use', required: false }),
     kubeconfig: Flags.string({ description: 'path to the kubeconfig file to use', required: false }),
   }
+  static strict = false
 
 
   async run(): Promise<void> {
@@ -39,14 +39,14 @@ export default class DelPods extends Command {
     const { args } = await this.parse(DelPods)
     const { namespace } = flags
 
-    if (argv.length < 1) {
+    if (argv.length === 0) {
       console.log(chalk.red("at list one resouce name is requied"))
       return
     }
 
     try {
-      for (let i = 0; i < argv.length; i++) {
-        const res = await api.delete(`/api/v1/namespaces/${namespace ?? "default"}/pods/${argv[i]}`)
+      for (const element of argv) {
+        const res = await api.delete(`/api/v1/namespaces/${namespace ?? "default"}/pods/${element}`)
 
         if (res.status == 404) {
           console.log(`no resource are found in the ${namespace ?? "default"} namespace`)

@@ -11,23 +11,27 @@ type ResourceMap = {
 
 
 function getAge(timestamp: string) {
-  let elapsed = Date.now() - new Date(timestamp).getTime()
+  const elapsed = Date.now() - new Date(timestamp).getTime()
   if (elapsed < 60_000) {
-    return `${Math.floor(elapsed / 1_000)}s`
+    return `${Math.floor(elapsed / 1000)}s`
   }
-  else if (elapsed < 3_600_000) {
+
+  if (elapsed < 3_600_000) {
     return `${Math.floor(elapsed / 60_000)}m`
-  } else if (elapsed < 86_400_000) {
-    return `${Math.floor(elapsed / 3_600_000)}h`
-  } else {
-    return `${Math.floor(elapsed / 86_400_000)}d`
   }
+
+  if (elapsed < 86_400_000) {
+    return `${Math.floor(elapsed / 3_600_000)}h`
+  }
+
+  return `${Math.floor(elapsed / 86_400_000)}d`
+
 }
 
 
 
-//FIRE: 
-//i have to make this function flexable as it can be to be used for all of terminal table related work
+// FIRE: 
+// i have to make this function flexable as it can be to be used for all of terminal table related work
 const renderToTerminal = <T extends keyof ResourceMap>(data: ResourceMap[T], ResType: T): T | void => {
 
   // i could mamke the functon to pass the types of resouce is beaing send and also teh data so using if statument 
@@ -40,41 +44,50 @@ const renderToTerminal = <T extends keyof ResourceMap>(data: ResourceMap[T], Res
 
   //
   //
-  //ok final tough i wil pass the resouce type plus data and make the tableData array and map function flexable by programaticaly  
+  // ok final tough i wil pass the resouce type plus data and make the tableData array and map function flexable by programaticaly  
 
 
 
-  //HOT: this neeed to be passed with tyeps like resType
+  // HOT: this neeed to be passed with tyeps like resType
   // and some data are not available and need to be programatic since some status change and dispayed in diffrent way
   // or use swich cases to help me render but it would still be huge since we have a lot of resouces 
   //
   //
 
   switch (ResType) {
-    case "Pod":
-      //@ts-ignore
-      RenderPod(data)
-      return
-    case "Deployment":
-      //@ts-ignore
+    case "Deployment": {
+      // @ts-ignore
       RenderDep(data)
       return
-    case "Namespace":
-      //@ts-ignore
+    }
+
+    case "Namespace": {
+      // @ts-ignore
       Namespace(data)
       return
-    case "Node":
-      //@ts-ignore
+    }
+
+    case "Node": {
+      // @ts-ignore
       NodeRes(data)
       return
-    default:
+    }
+
+    case "Pod": {
+      // @ts-ignore
+      RenderPod(data)
+      return
+    }
+
+    default: {
       console.log("dfault logs")
+    }
   }
 }
 
 
-//HOT:
-//i have to fix the sing pod rendering problem 
+// HOT:
+// i have to fix the sing pod rendering problem 
 
 const RenderPod = (data: RsPodtype[]) => {
   const tableData = [
@@ -104,7 +117,7 @@ const Namespace = (data: RsPodtype[]) => {
 const NodeRes = (data: NodeResType[]) => {
 
   const getNodeRoles = (item: NodeResType) => {
-    let lables = item?.metadata?.labels
+    const lables = item?.metadata?.labels
     let label = ""
     for (const it in lables) {
       if (it == "node-role.kubernetes.io/control-plane") {
@@ -114,11 +127,12 @@ const NodeRes = (data: NodeResType[]) => {
 
     return label
   }
+
   const tableData = [
     ['NAME', 'STATUS', 'ROLES', "AGE", 'VERSION'],
     ...data?.map((item) => [
       item?.metadata?.name,
-      item.status?.conditions[item.status.conditions.length - 1].type,
+      item.status?.conditions?.at(-1)?.type,
       getNodeRoles(item)?.length > 0 ? getNodeRoles(item) : "<none>",
       getAge(item?.metadata?.creationTimestamp),
       item?.status?.nodeInfo?.kubeletVersion,

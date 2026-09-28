@@ -31,14 +31,14 @@ export default class Pod extends Command {
     kubeconfig: Flags.string({ description: 'path to the kubeconfig file to use', required: false }),
   }
 
-  //FIRE: 
-  //identify or learn what apply and create command do do they differ or same and if they are the same can i just put one as alias 
+  // FIRE: 
+  // identify or learn what apply and create command do do they differ or same and if they are the same can i just put one as alias 
   //
-  //HOT: 
-  //get files and maker sure files are not empty 
-  //convert to json 
-  //send to 
-  //show the relevent message to usr
+  // HOT: 
+  // get files and maker sure files are not empty 
+  // convert to json 
+  // send to 
+  // show the relevent message to usr
   // identify what are the falgs reqruired beside -f in createing or applying for pods 
   async run(): Promise<void> {
     const { flags } = await this.parse(Pod)
@@ -56,7 +56,7 @@ export default class Pod extends Command {
       const jsonfile = await yamlToJson(RootPath)
       const res = await api.post(`/api/v1/namespaces/${namespace ?? "default"}/pods`, jsonfile)
       console.log("res", res.data)
-      //HOT: this reponse types need to be fixed not console log but as the real kubect does it reponse with table type response 
+      // HOT: this reponse types need to be fixed not console log but as the real kubect does it reponse with table type response 
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.log(error.response?.data?.message)
