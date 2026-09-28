@@ -20,6 +20,8 @@ export default [
       'perfectionist/sort-objects': 'off',
       'perfectionist/sort-object-types': 'off',
 
+      "perfectionist/sort-interfaces": "off",
+
       // Don't enforce this stylistic preference
       'arrow-body-style': 'off',
 
