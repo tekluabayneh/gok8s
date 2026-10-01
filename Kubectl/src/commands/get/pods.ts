@@ -1,8 +1,9 @@
 import { Args, Command, Flags } from '@oclif/core'
-import api from '../../client/client.js'
+import creaetApi from '../../client/create_api.js'
 import axios from 'axios'
 import chalk from 'chalk'
 import renderToTerminal from '../../utils/render-to-terminal.js'
+import loadConfig from '../../client/config.js'
 
 
 export default class Pods extends Command {
@@ -41,10 +42,19 @@ export default class Pods extends Command {
 
     // TODO: 
     // change the iterating with Promise.ALL instade of just using this one which also raise lint error
+    const resOfConfig = await loadConfig()
+    if (!resOfConfig) return // this need to be notified not only return silently 
 
     try {
       const namePart = args.podName ? "/" + args.podName : ""
-      const res = await api.get(`/api/v1/namespaces/${namespace ?? "default"}/pods${namePart}`)
+      let url = `/api/v1/namespaces/${namespace ?? "default"}/pods${namePart}`
+      const api = await creaetApi()
+      if (!api) {
+        console.log(chalk.red("something went wront Opps!"))
+        return
+      }
+      const res = await api.get(url)
+
       renderToTerminal(res.data.items ?? [res.data], "Pod")
 
       if (res.data.item ? res.data.items?.length === 0 : false) {

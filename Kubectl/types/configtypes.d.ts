@@ -97,4 +97,18 @@ export type RsPodtype = {
   }
 }
 
+
+export type KubeconfType = {
+  currentContext: string
+  certificateAuthorityData: string
+  insecureSkipTlsVerify: boolean
+  contextUser: string
+  contextCluster: string
+  token: string
+  BASE_URL: string
+  clientCertificateData: string
+  clientKeyData: string
+
+}
+
 // export type { KubectlConfigType, RsPodtype }

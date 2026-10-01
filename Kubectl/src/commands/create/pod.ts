@@ -1,8 +1,8 @@
 import { Command, Flags } from '@oclif/core'
 import { yamlToJson } from '../../utils/yaml-to-json.js'
-import api from '../../client/client.js'
 import chalk from 'chalk'
 import axios from 'axios'
+import creaetApi from '../../client/create_api.js'
 
 
 export default class Pod extends Command {
@@ -43,6 +43,11 @@ export default class Pod extends Command {
     const { flags } = await this.parse(Pod)
     const { filename, namespace } = flags
 
+    const api = await creaetApi()
+    if (!api) {
+      console.log(chalk.red("Something went wrong Opps!"))
+      return
+    }
 
     try {
       if (!filename) {
