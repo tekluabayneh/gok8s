@@ -1,8 +1,8 @@
 import { Args, Command, Flags } from '@oclif/core'
-import api from '../../client/client.js'
 import axios from 'axios'
 import chalk from 'chalk'
 import renderToTerminal from '../../utils/render-to-terminal.js'
+import creaetApi from '../../client/create_api.js'
 export default class Namespace extends Command {
   static aliases = ['get:ns']
   static args = {
@@ -37,6 +37,13 @@ export default class Namespace extends Command {
   async run(): Promise<void> {
     const { argv, flags } = await this.parse(Namespace)
     const { namespace } = flags
+
+    const api = await creaetApi()
+    if (!api) {
+      console.log(chalk.red("Something went wrong Opps!"))
+      return
+    }
+
 
     try {
 

@@ -1,8 +1,8 @@
 import { Args, Command, Flags } from '@oclif/core'
-import api from '../../client/client.js'
 import axios from 'axios'
 import chalk from 'chalk'
 import renderToTerminal from '../../utils/render-to-terminal.js'
+import creaetApi from '../../client/create_api.js'
 
 
 export default class Nodes extends Command {
@@ -38,10 +38,17 @@ export default class Nodes extends Command {
 
   async run(): Promise<void> {
     const { argv } = await this.parse(Nodes)
+    const api = await creaetApi()
+    if (!api) {
+      console.log(chalk.red("Something went wrong Opps!"))
+      return
+    }
 
     try {
       if (argv.length > 0) {
         for (const element of argv) {
+
+
           const res = await api.get(`/api/v1/nodes/${element}`)
 
           renderToTerminal(res.data.items ?? [res.data], "Node")
@@ -54,6 +61,7 @@ export default class Nodes extends Command {
 
         return
       }
+
 
       const res = await api.get(`/api/v1/nodes`)
       renderToTerminal(res.data.items ?? [res.data], "Node")

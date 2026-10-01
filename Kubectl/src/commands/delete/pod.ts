@@ -1,7 +1,7 @@
 import { Args, Command, Flags } from '@oclif/core'
-import api from '../../client/client.js'
 import axios from 'axios'
 import chalk from 'chalk'
+import creaetApi from '../../client/create_api.js'
 
 
 export default class DelPods extends Command {
@@ -38,6 +38,13 @@ export default class DelPods extends Command {
     const { argv, flags } = await this.parse(DelPods)
     const { args } = await this.parse(DelPods)
     const { namespace } = flags
+
+    const api = await creaetApi()
+    if (!api) {
+      console.log(chalk.red("Something went wrong Opps!"))
+      return
+    }
+
 
     if (argv.length === 0) {
       console.log(chalk.red("at list one resouce name is requied"))
