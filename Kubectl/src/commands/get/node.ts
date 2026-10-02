@@ -1,8 +1,7 @@
-import { Args, Command, Flags } from '@oclif/core'
-import api from '../../client/client.js'
-import axios from 'axios'
-import chalk from 'chalk'
-import renderToTerminal from '../../utils/render-to-terminal.js'
+import { Args, Command } from '@oclif/core'
+import createFlags from '../../flags/statis.js'
+import { nodeService } from '../../services/node.js'
+import creaetApi from '../../client/create_api.js'
 
 
 export default class Nodes extends Command {
@@ -10,66 +9,24 @@ export default class Nodes extends Command {
   static args = {
     podName: Args.string(),
   }
-  static flags = {
-    namespace: Flags.string({ char: 'n', description: 'namespace scope for this request', required: false }),
-    allNamespaces: Flags.boolean({ char: 'A', description: 'list the requested object(s) across all namespaces', required: false }),
-    output: Flags.string({ char: 'o', description: 'output format (json|yaml|wide|name)', required: false }),
-    selector: Flags.string({ char: 'l', description: 'label selector to filter results', required: false }),
-    fieldSelector: Flags.string({ description: 'field selector to filter results', required: false }),
-    watch: Flags.boolean({ char: 'w', description: 'watch for changes after listing/getting', required: false }),
-    watchOnly: Flags.boolean({ description: 'watch for changes without doing an initial list', required: false }),
-    showLabels: Flags.boolean({ description: 'show all labels as the last column', required: false }),
-    showKind: Flags.boolean({ description: 'show the kind name for each resource', required: false }),
-    sortBy: Flags.string({ description: 'sort list using a jsonpath expression', required: false }),
-    noHeaders: Flags.boolean({ description: 'omit headers from the output', required: false }),
-    ignoreNotFound: Flags.boolean({ description: 'treat "resource not found" as a successful exit', required: false }),
-    filename: Flags.string({ char: 'f', description: 'file, directory, or URL to identify resources', required: false, multiple: false }),
-    kustomize: Flags.string({ char: 'k', description: 'process a kustomization directory', required: false }),
-    recursive: Flags.boolean({ char: 'R', description: 'process the directory used in -f recursively', required: false }),
-    chunkSize: Flags.integer({ description: 'batch size for large list requests', required: false }),
-    outputWatchEvents: Flags.boolean({ description: 'output watch event objects with type and object', required: false }),
-    raw: Flags.string({ description: 'raw URI to request from the server', required: false }),
-    subresource: Flags.string({ description: 'fetch a named subresource (status|scale) instead of the object', required: false }),
-    context: Flags.string({ description: 'name of the kubeconfig context to use', required: false }),
-    kubeconfig: Flags.string({ description: 'path to the kubeconfig file to use', required: false }),
-  }
+static flags = createFlags({})
   static strict: boolean = false
-
 
   async run(): Promise<void> {
     const { argv } = await this.parse(Nodes)
+    const api = await creaetApi()
 
-    try {
-      if (argv.length > 0) {
-        for (const element of argv) {
-          const res = await api.get(`/api/v1/nodes/${element}`)
 
-          renderToTerminal(res.data.items ?? [res.data], "Node")
-
-          if (res.data.item ? res.data.items?.length === 0 : false) {
-            console.log(`no resource are found`)
-          }
-
-        }
-
-        return
+    if (argv.length > 0) {
+      for (const element of argv) {
+        const url = `/api/v1/nodes/${element}`
+        nodeService(api, url, null, "get")
       }
 
-      const res = await api.get(`/api/v1/nodes`)
-      renderToTerminal(res.data.items ?? [res.data], "Node")
-
-      if (res.data.item ? res.data.items?.length === 0 : false) {
-        console.log(`no resource are found`)
-      }
-
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.log(error.response?.data.message)
-      } else {
-        console.log(chalk.red("something went wrong", error))
-      }
+      return
     }
 
+    nodeService(api, "/api/v1/nodes", null, "get")
   }
 
 }
