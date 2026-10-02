@@ -1,7 +1,7 @@
-import axios, { AxiosResponse, AxiosInstance } from "axios"
+import axios, { AxiosInstance, AxiosResponse } from "axios"
 import renderToTerminal, { ResourceMap } from "../utils/render-to-terminal.js"
 import chalk from "chalk"
-type ActionType = "create" | "get" | "delete"
+type ActionType = "create" | "delete" | "get"
 
 
 // this function must flexable to handle all kinds pods service
@@ -11,21 +11,17 @@ export const PodService = async (api: AxiosInstance | undefined, url: string, na
       console.log(chalk.red("something went wrong Opps!"))
       return
     }
+
     let res: AxiosResponse
 
     switch (type) {
-      case "get":
-        res = await api.get(url)
-        renderToTerminal(res.data.items ?? [res.data], "Pod")
-        if (res?.data?.item ? res?.data?.items?.length === 0 : false) {
-          console.log(`no resource are found in the ${namespace ?? "default"} namespace`)
-        }
-        return
-      case "create":
+      case "create": {
         res = await api.post(url, manifest)
         console.log("res", res.data)
         return
-      case "delete":
+      }
+
+      case "delete": {
         res = await api.delete(url)
         console.log(res)
         if (res.status == 200) {
@@ -33,9 +29,23 @@ export const PodService = async (api: AxiosInstance | undefined, url: string, na
         } else {
           console.log(chalk.red(`${res.data.message}`))
         }
+
         return
-      default:
+      }
+
+      case "get": {
+        res = await api.get(url)
+        renderToTerminal(res.data.items ?? [res.data], "Pod")
+        if (res?.data?.item ? res?.data?.items?.length === 0 : false) {
+          console.log(`no resource are found in the ${namespace ?? "default"} namespace`)
+        }
+
+        return
+      }
+
+      default: {
         console.log("default")
+      }
     }
 
   } catch (error) {

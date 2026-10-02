@@ -8,6 +8,7 @@ import { PodService } from '../../services/pod.js'
 
 export default class Pod extends Command {
   static flags = createFlags({ filename: true })
+
   // FIRE: 
   // identify or learn what apply and create command do do they differ or same and if they are the same can i just put one as alias 
   //

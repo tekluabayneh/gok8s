@@ -9,8 +9,7 @@ export default class Nodes extends Command {
   static args = {
     podName: Args.string(),
   }
-
-  static flags = createFlags({})
+static flags = createFlags({})
   static strict: boolean = false
 
   async run(): Promise<void> {
@@ -23,8 +22,10 @@ export default class Nodes extends Command {
         const url = `/api/v1/nodes/${element}`
         nodeService(api, url, null, "get")
       }
+
       return
     }
+
     nodeService(api, "/api/v1/nodes", null, "get")
   }
 

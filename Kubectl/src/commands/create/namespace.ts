@@ -27,7 +27,7 @@ export default class Namespace extends Command {
     }
 
     const jsonfile = { metadata: { name: args.nameOfNs } }
-    NamespaceService(api, `/api/v1/namespaces`, jsonfile as Object, "create", args)
+    NamespaceService(api, `/api/v1/namespaces`, jsonfile as object, "create", args)
   }
 
 }

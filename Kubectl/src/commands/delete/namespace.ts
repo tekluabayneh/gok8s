@@ -9,8 +9,7 @@ export default class DelNamespace extends Command {
   static args = {
     podName: Args.string(),
   }
-
-  static flags = createFlags({})
+static flags = createFlags({})
   static strict = false
 
 

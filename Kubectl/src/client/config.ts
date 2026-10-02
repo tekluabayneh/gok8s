@@ -1,8 +1,7 @@
 import os from "node:os"
 
-import type { KubectlconfigType } from "../../types/configtypes.d.js"
+import type { KubeconfType , KubectlconfigType } from "../../types/configtypes.d.js"
 
-import type { KubeconfType } from "../../types/configtypes.js"
 import { yamlToJson } from "../utils/yaml-to-json.js"
 
 import chalk from "chalk"
@@ -11,7 +10,7 @@ import { promises as stPromise } from "node:fs"
 
 // loadconfig shoudl return those credential not load them to global varible 
 async function loadConfig(): Promise<KubeconfType | void> {
-  let conf = {
+  const conf = {
     "currentContext": "",
     "certificateAuthorityData": "",
     "insecureSkipTlsVerify": false,
@@ -80,6 +79,7 @@ async function loadConfig(): Promise<KubeconfType | void> {
       }
     }
   }
+
   return conf
 }
 

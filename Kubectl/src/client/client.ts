@@ -4,10 +4,10 @@ import type { KubeconfType } from "../../types/configtypes.js"
 import chalk from "chalk";
 
 
-//TODO: 
-//this function should be turned into facoty pattern
-//so anyone who gets it won't call it as singleton pattern instade it will use as dependency injection so 
-//everytime commands used it, it won't have side effect 
+// TODO: 
+// this function should be turned into facoty pattern
+// so anyone who gets it won't call it as singleton pattern instade it will use as dependency injection so 
+// everytime commands used it, it won't have side effect 
 
 async function createFactoryApi(conf: KubeconfType, agent: https.Agent) {
   const api = axios.create({
@@ -36,6 +36,7 @@ async function createFactoryApi(conf: KubeconfType, agent: https.Agent) {
     } else {
       console.log(chalk.red("something went wrong", error))
     }
+
     return Promise.reject(error);
   });
 

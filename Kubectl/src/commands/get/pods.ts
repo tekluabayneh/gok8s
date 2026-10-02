@@ -14,8 +14,8 @@ export default class Pods extends Command {
   static flags = createFlags({})
 
 
-  //TODO: 
-  //this function must also handle single post request with muttiple names 
+  // TODO: 
+  // this function must also handle single post request with muttiple names 
 
   async run(): Promise<void> {
     const { args, flags } = await this.parse(Pods)
@@ -30,7 +30,7 @@ export default class Pods extends Command {
     }
 
     const namePart = args.podName ? "/" + args.podName : ""
-    let url = `/api/v1/namespaces/${namespace ?? "default"}/pods${namePart}`
+    const url = `/api/v1/namespaces/${namespace ?? "default"}/pods${namePart}`
     const api = await creaetApi()
     PodService(api, url, namespace, null, "get")
   }

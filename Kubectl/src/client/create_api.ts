@@ -9,6 +9,7 @@ const creaetApi = async () => {
     console.log(chalk.red("configuration files is not loaded"))
     return
   }
+
   return createFactoryApi(resOfConfig, await buildAgent(resOfConfig))
 }
 

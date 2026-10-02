@@ -20,10 +20,11 @@ export default class Namespace extends Command {
         const url = `/api/v1/namespaces/${name}`
         NamespaceService(api, url, null, "get")
       }
+
       return
     }
 
-    let url = "/api/v1/namespaces/"
+    const url = "/api/v1/namespaces/"
     NamespaceService(api, url, null, "get")
   }
 }

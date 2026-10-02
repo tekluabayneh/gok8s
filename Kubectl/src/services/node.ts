@@ -1,8 +1,8 @@
 
-import axios, { AxiosResponse, AxiosInstance } from "axios"
+import axios, { AxiosInstance, AxiosResponse } from "axios"
 import renderToTerminal, { ResourceMap } from "../utils/render-to-terminal.js"
 import chalk from "chalk"
-type ActionType = "create" | "get" | "delete"
+type ActionType = "create" | "delete" | "get"
 
 
 // this function must flexable to handle all kinds pods service
@@ -12,16 +12,18 @@ export const nodeService = async (api: AxiosInstance | undefined, url: string, m
       console.log(chalk.red("something went wrong Opps!"))
       return
     }
+
     let res: AxiosResponse
 
     switch (type) {
-      case "get":
+      case "get": {
         res = await api.get(url)
         renderToTerminal(res.data.items ?? [res.data], "Node")
         if (res?.data?.item ? res?.data?.items?.length === 0 : false) {
           console.log(`no resource are found`)
         }
-        return
+      }
+        
       case "create":
     }
 
