@@ -1,7 +1,8 @@
-import { Args, Command, Flags } from '@oclif/core'
-import axios from 'axios'
+import { Args, Command } from '@oclif/core'
 import chalk from 'chalk'
 import creaetApi from '../../client/create_api.js'
+import createFlags from '../../flags/statis.js'
+import { NamespaceService } from '../../services/namespace.js'
 
 
 export default class DelNamespace extends Command {
@@ -9,72 +10,25 @@ export default class DelNamespace extends Command {
   static args = {
     podName: Args.string(),
   }
-  static flags = {
-    namespace: Flags.string({ char: 'n', description: 'namespace scope for this request', required: false }),
-    allNamespaces: Flags.boolean({ char: 'A', description: 'list the requested object(s) across all namespaces', required: false }),
-    output: Flags.string({ char: 'o', description: 'output format (json|yaml|wide|name)', required: false }),
-    selector: Flags.string({ char: 'l', description: 'label selector to filter results', required: false }),
-    fieldSelector: Flags.string({ description: 'field selector to filter results', required: false }),
-    watch: Flags.boolean({ char: 'w', description: 'watch for changes after listing/getting', required: false }),
-    watchOnly: Flags.boolean({ description: 'watch for changes without doing an initial list', required: false }),
-    showLabels: Flags.boolean({ description: 'show all labels as the last column', required: false }),
-    showKind: Flags.boolean({ description: 'show the kind name for each resource', required: false }),
-    sortBy: Flags.string({ description: 'sort list using a jsonpath expression', required: false }),
-    noHeaders: Flags.boolean({ description: 'omit headers from the output', required: false }),
-    ignoreNotFound: Flags.boolean({ description: 'treat "resource not found" as a successful exit', required: false }),
-    filename: Flags.string({ char: 'f', description: 'file, directory, or URL to identify resources', required: false, multiple: false }),
-    kustomize: Flags.string({ char: 'k', description: 'process a kustomization directory', required: false }),
-    recursive: Flags.boolean({ char: 'R', description: 'process the directory used in -f recursively', required: false }),
-    chunkSize: Flags.integer({ description: 'batch size for large list requests', required: false }),
-    outputWatchEvents: Flags.boolean({ description: 'output watch event objects with type and object', required: false }),
-    raw: Flags.string({ description: 'raw URI to request from the server', required: false }),
-    subresource: Flags.string({ description: 'fetch a named subresource (status|scale) instead of the object', required: false }),
-    context: Flags.string({ description: 'name of the kubeconfig context to use', required: false }),
-    kubeconfig: Flags.string({ description: 'path to the kubeconfig file to use', required: false }),
-  }
+
+  static flags = createFlags({})
   static strict = false
 
 
   async run(): Promise<void> {
-    const { argv, flags } = await this.parse(DelNamespace)
-    const { args } = await this.parse(DelNamespace)
-    const { namespace } = flags
+    const { argv } = await this.parse(DelNamespace)
 
     const api = await creaetApi()
-    if (!api) {
-      console.log(chalk.red("Something went wrong Opps!"))
-      return
-    }
-
     if (argv.length === 0) {
       console.log(chalk.red("at list one resouce name is requied"))
       return
     }
 
-    try {
-      for (const element of argv) {
-        const res = await api.delete(`/api/v1/namespaces/${element}`)
-
-        if (res.status === 404) {
-          console.log(`no resource are found in the ${namespace ?? "default"} namespace`)
-        }
-
-
-        if (res.status === 200) {
-          console.log(`namespce "${args.podName}" deleted `)
-        }
-      }
-
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.log(error.response?.data.message)
-      } else {
-        console.log(chalk.red("something went wrong", error))
-      }
+    for (const name of argv) {
+      const url = `/api/v1/namespaces/${name}`
+      NamespaceService(api, url, null, "delete", undefined, name as string)
     }
-
   }
-
 }
 
 

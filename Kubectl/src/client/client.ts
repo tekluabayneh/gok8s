@@ -2,6 +2,7 @@ import axios from "axios"
 
 import https from "node:https"
 import type { KubeconfType } from "../../types/configtypes.js"
+import chalk from "chalk";
 
 //TODO: 
 //this function should be turned into facoty pattern
@@ -30,7 +31,11 @@ async function createFactoryApi(conf: KubeconfType, agent: https.Agent) {
 
     return config;
   }, (error) => {
-    console.log(error)
+    if (axios.isAxiosError(error)) {
+      console.log(error.response?.data.message)
+    } else {
+      console.log(chalk.red("something went wrong", error))
+    }
     return Promise.reject(error);
   });
 

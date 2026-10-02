@@ -2,7 +2,7 @@ import { table } from "table";
 import type { RsPodtype } from "../../types/configtypes.js";
 import type { Node as NodeResType } from "../../types/node.js";
 
-type ResourceMap = {
+export type ResourceMap = {
   Pod: RsPodtype[],
   Deployment: RsPodtype[],
   Namespace: RsPodtype[],
