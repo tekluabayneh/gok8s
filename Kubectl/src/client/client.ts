@@ -1,8 +1,8 @@
 import axios from "axios"
-
 import https from "node:https"
 import type { KubeconfType } from "../../types/configtypes.js"
 import chalk from "chalk";
+
 
 //TODO: 
 //this function should be turned into facoty pattern
@@ -38,8 +38,6 @@ async function createFactoryApi(conf: KubeconfType, agent: https.Agent) {
     }
     return Promise.reject(error);
   });
-
-
 
 
   return api

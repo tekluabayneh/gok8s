@@ -1,8 +1,8 @@
-import { Args, Command } from '@oclif/core'
 import chalk from 'chalk'
 import creaetApi from '../../client/create_api.js'
 import createFlags from '../../flags/statis.js'
 import { PodService } from '../../services/pod.js'
+import { Args, Command } from '@oclif/core'
 
 
 export default class DelPods extends Command {
@@ -19,7 +19,6 @@ export default class DelPods extends Command {
     const { namespace } = flags
 
     const api = await creaetApi()
-
     if (argv.length === 0) {
       console.log(chalk.red("at list one resouce name is requied"))
       return

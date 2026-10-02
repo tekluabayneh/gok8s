@@ -1,9 +1,8 @@
 import { Args, Command } from '@oclif/core'
-import chalk from 'chalk'
 import creaetApi from '../../client/create_api.js'
 import createFlags from '../../flags/statis.js'
 import { NamespaceService } from '../../services/namespace.js'
-
+import chalk from 'chalk'
 
 export default class DelNamespace extends Command {
   static aliases = ['delete:ns']

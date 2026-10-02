@@ -1,7 +1,7 @@
-import { Args, Command, Flags } from '@oclif/core'
-import creaetApi from '../../client/create_api.js'
+import { Args, Command } from '@oclif/core'
 import createFlags from '../../flags/statis.js'
 import { nodeService } from '../../services/node.js'
+import creaetApi from '../../client/create_api.js'
 
 
 export default class Nodes extends Command {

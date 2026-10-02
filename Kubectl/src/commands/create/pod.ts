@@ -1,4 +1,4 @@
-import { Command, Flags } from '@oclif/core'
+import { Command } from '@oclif/core'
 import { yamlToJson } from '../../utils/yaml-to-json.js'
 import chalk from 'chalk'
 import creaetApi from '../../client/create_api.js'

@@ -1,7 +1,8 @@
-import { Args, Command, Flags } from '@oclif/core'
+import { Args, Command } from '@oclif/core'
 import creaetApi from '../../client/create_api.js'
 import createFlags from '../../flags/statis.js'
 import { NamespaceService } from '../../services/namespace.js'
+
 export default class Namespace extends Command {
   static aliases = ['get:ns']
   static args = {

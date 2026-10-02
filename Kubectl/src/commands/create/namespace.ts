@@ -1,4 +1,3 @@
-
 import { Args, Command } from '@oclif/core'
 import { yamlToJson } from '../../utils/yaml-to-json.js'
 import creaetApi from '../../client/create_api.js'
@@ -24,6 +23,7 @@ export default class Namespace extends Command {
       const jsonfile = await yamlToJson(RootPath)
       NamespaceService(api, `/api/v1/namespaces`, jsonfile as JSON, "create", args, filename)
       return
+
     }
 
     const jsonfile = { metadata: { name: args.nameOfNs } }
