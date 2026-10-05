@@ -1,11 +1,14 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios"
-import renderToTerminal, { ResourceMap } from "../utils/render-to-terminal.js"
+import renderToTerminal from "../utils/render-to-terminal.js"
 import chalk from "chalk"
 type ActionType = "create" | "delete" | "get"
 
+//TODO: 
+//first proper message need to be loged 
+//second reptitive logs need to be remove and one certralized logs need to handle them 
 
-// this function must flexable to handle all kinds pods service
-export const PodService = async (api: AxiosInstance | undefined, url: string, namespace: string | undefined, manifest: JSON | null, type: ActionType, name?: string) => {
+
+export const podService = async (api: AxiosInstance | undefined, url: string, namespace: string | undefined, manifest: JSON | null, type: ActionType, name?: string) => {
   try {
     if (!api) {
       console.log(chalk.red("something went wrong Opps!"))
@@ -17,7 +20,10 @@ export const PodService = async (api: AxiosInstance | undefined, url: string, na
     switch (type) {
       case "create": {
         res = await api.post(url, manifest)
-        console.log("res", res.data)
+        if (res.status == 201) {
+          //@ts-expect-error metadata.name always exists till i find better way to get the name this stays like this 
+          console.log(chalk.green(`pod/"${manifest?.metadata?.name ?? ""}" created`))
+        }
         return
       }
 
@@ -35,12 +41,10 @@ export const PodService = async (api: AxiosInstance | undefined, url: string, na
 
       case "get": {
         res = await api.get(url)
-        renderToTerminal(res.data.items ?? [res.data], "Pod")
         if (res?.data?.item ? res?.data?.items?.length === 0 : false) {
           console.log(`no resource are found in the ${namespace ?? "default"} namespace`)
         }
-
-        return
+        return renderToTerminal(res.data.items ?? [res.data], "Pod")
       }
 
       default: {

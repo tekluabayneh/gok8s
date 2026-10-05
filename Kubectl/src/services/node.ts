@@ -18,12 +18,12 @@ export const nodeService = async (api: AxiosInstance | undefined, url: string, m
     switch (type) {
       case "get": {
         res = await api.get(url)
-        renderToTerminal(res.data.items ?? [res.data], "Node")
         if (res?.data?.item ? res?.data?.items?.length === 0 : false) {
           console.log(`no resource are found`)
         }
+        return renderToTerminal(res.data.items ?? [res.data], "Node")
       }
-        
+
       case "create":
     }
 

@@ -36,13 +36,13 @@ export const NamespaceService = async (api: AxiosInstance | undefined, url: stri
 
       case "get": {
         res = await api.get(url)
-        renderToTerminal(res.data.items ?? [res.data], "Namespace")
         if (res?.data?.item ? res?.data?.items?.length === 0 : false) {
           console.log(`no resource are found `)
         }
 
-        return
       }
+
+        return renderToTerminal(res.data.items ?? [res.data], "Namespace")
 
       default: {
         console.log("default rached i dont why")
