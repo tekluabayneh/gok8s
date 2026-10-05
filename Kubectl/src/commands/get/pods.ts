@@ -2,8 +2,9 @@ import { Args, Command } from '@oclif/core'
 import creaetApi from '../../client/create_api.js'
 import chalk from 'chalk'
 import loadConfig from '../../client/config.js'
-import { PodService } from '../../services/pod.js'
+import { podService } from '../../services/pod.js'
 import createFlags from '../../flags/statis.js'
+import { table } from 'table'
 
 
 export default class Pods extends Command {
@@ -32,7 +33,10 @@ export default class Pods extends Command {
     const namePart = args.podName ? "/" + args.podName : ""
     const url = `/api/v1/namespaces/${namespace ?? "default"}/pods${namePart}`
     const api = await creaetApi()
-    PodService(api, url, namespace, null, "get")
+    const tableData = await podService(api, url, namespace, null, "get")
+    if (!tableData) return
+    this.log(table(tableData))
+
   }
 }
 

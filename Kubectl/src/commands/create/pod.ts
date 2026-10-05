@@ -3,7 +3,8 @@ import { yamlToJson } from '../../utils/yaml-to-json.js'
 import chalk from 'chalk'
 import creaetApi from '../../client/create_api.js'
 import createFlags from '../../flags/statis.js'
-import { PodService } from '../../services/pod.js'
+import { podService } from '../../services/pod.js'
+import { table } from 'table'
 
 
 export default class Pod extends Command {
@@ -32,7 +33,11 @@ export default class Pod extends Command {
     const jsonfile = await yamlToJson(RootPath)
 
     const url = `/api/v1/namespaces/${namespace ?? "default"}/pods`
-    PodService(api, url, namespace, jsonfile as JSON, "create")
+    const tableData = await podService(api, url, namespace, jsonfile as JSON, "create")
+    if (!tableData) return
+    this.log(table(tableData))
+
+
     // HOT: this reponse types need to be fixed not console log but as the real kubect does it reponse with table type response 
     // and also should hadle fake pod create only with command line like (mykubectl run nginx )
   }

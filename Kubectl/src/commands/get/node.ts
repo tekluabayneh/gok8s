@@ -2,6 +2,7 @@ import { Args, Command } from '@oclif/core'
 import createFlags from '../../flags/statis.js'
 import { nodeService } from '../../services/node.js'
 import creaetApi from '../../client/create_api.js'
+import { table } from 'table'
 
 
 export default class Nodes extends Command {
@@ -9,7 +10,7 @@ export default class Nodes extends Command {
   static args = {
     podName: Args.string(),
   }
-static flags = createFlags({})
+  static flags = createFlags({})
   static strict: boolean = false
 
   async run(): Promise<void> {
@@ -20,13 +21,21 @@ static flags = createFlags({})
     if (argv.length > 0) {
       for (const element of argv) {
         const url = `/api/v1/nodes/${element}`
-        nodeService(api, url, null, "get")
+        const tableData = await nodeService(api, url, null, "get")
+        if (!tableData) return
+        this.log(table(tableData))
+
+
       }
 
       return
     }
 
-    nodeService(api, "/api/v1/nodes", null, "get")
+    const tableData = await nodeService(api, "/api/v1/nodes", null, "get")
+    if (!tableData) return
+    this.log(table(tableData))
+
+
   }
 
 }

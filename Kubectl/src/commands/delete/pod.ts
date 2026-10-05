@@ -1,8 +1,9 @@
 import chalk from 'chalk'
 import creaetApi from '../../client/create_api.js'
 import createFlags from '../../flags/statis.js'
-import { PodService } from '../../services/pod.js'
+import { podService } from '../../services/pod.js'
 import { Args, Command } from '@oclif/core'
+import { table } from 'table'
 
 
 export default class DelPods extends Command {
@@ -27,7 +28,10 @@ export default class DelPods extends Command {
 
     for (const name of argv) {
       const url = `/api/v1/namespaces/${namespace ?? "default"}/pods/${name}`
-      PodService(api, url, namespace, null, "delete", name as string)
+      const tableData = await podService(api, url, namespace, null, "delete", name as string)
+      if (!tableData) return
+      this.log(table(tableData))
+
 
 
     }

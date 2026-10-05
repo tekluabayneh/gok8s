@@ -3,6 +3,7 @@ import { yamlToJson } from '../../utils/yaml-to-json.js'
 import creaetApi from '../../client/create_api.js'
 import { NamespaceService } from '../../services/namespace.js'
 import createFlags from '../../flags/statis.js'
+import { table } from 'table'
 
 
 export default class Namespace extends Command {
@@ -21,13 +22,21 @@ export default class Namespace extends Command {
     if (filename) {
       const RootPath = process.cwd() + filename
       const jsonfile = await yamlToJson(RootPath)
-      NamespaceService(api, `/api/v1/namespaces`, jsonfile as JSON, "create", args, filename)
+      const tableData = await NamespaceService(api, `/api/v1/namespaces`, jsonfile as JSON, "create", args, filename)
+      if (!tableData) return
+      this.log(table(tableData))
+
+
       return
 
     }
 
     const jsonfile = { metadata: { name: args.nameOfNs } }
-    NamespaceService(api, `/api/v1/namespaces`, jsonfile as object, "create", args)
+    const tableData = await NamespaceService(api, `/api/v1/namespaces`, jsonfile as object, "create", args)
+    if (!tableData) return
+    this.log(table(tableData))
+
+
   }
 
 }
