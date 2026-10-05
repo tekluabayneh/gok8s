@@ -2,7 +2,7 @@ import { table } from "table";
 import type { RsPodtype } from "../../types/configtypes.js";
 import type { Node as NodeResType } from "../../types/node.js";
 
-type ResourceMap = {
+export type ResourceMap = {
   Pod: RsPodtype[],
   Deployment: RsPodtype[],
   Namespace: RsPodtype[],
@@ -29,31 +29,27 @@ function getAge(timestamp: string) {
 }
 
 
-const renderToTerminal = <T extends keyof ResourceMap>(data: ResourceMap[T], ResType: T): T | void => {
+const renderToTerminal = <T extends keyof ResourceMap>(data: ResourceMap[T], ResType: T): (string | undefined)[][] | void => {
 
   switch (ResType) {
     case "Deployment": {
       // @ts-expect-error i will fix this type error when i have types for each of htem
-      renderDep(data)
-      return
+      return renderDep(data)
     }
 
     case "Namespace": {
       // @ts-expect-error i will fix this type error when i have types for each of htem
-      namespace(data)
-      return
+      return namespace(data)
     }
 
     case "Node": {
       // @ts-expect-error i will fix this type error when i have types for each of htem
-      nodeRes(data)
-      return
+      return nodeRes(data)
     }
 
     case "Pod": {
       // @ts-expect-error i will fix this type error when i have types for each of htem
-      renderPod(data)
-      return
+      return renderPod(data)
     }
 
     default: {
@@ -74,7 +70,8 @@ const renderPod = (data: RsPodtype[]) => {
     ])
   ];
 
-  console.log(table(tableData))
+  // console.log(table(tableData))
+  return tableData
 }
 
 const renderDep = (data: RsPodtype[]) => {
@@ -89,7 +86,7 @@ const namespace = (data: RsPodtype[]) => {
     ])
   ];
 
-  console.log(table(tableData))
+  return tableData
 }
 
 const nodeRes = (data: NodeResType[]) => {
@@ -116,8 +113,7 @@ const nodeRes = (data: NodeResType[]) => {
       item?.status?.nodeInfo?.kubeletVersion,
     ])
   ];
-  console.log(table(tableData))
-
+  return tableData
 }
 
 export default renderToTerminal
