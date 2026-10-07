@@ -27,7 +27,7 @@ function createConfigFile() {
   try {
     console.log("it reached hre")
 
-    const defaultPath = path.join(os.homedir() + ".kube", "config")
+    const defaultPath = path.join(os.homedir() + "/.kube", "config")
     if (!fs.existsSync(defaultPath)) {
       fs.mkdirSync(path.dirname(defaultPath), { recursive: true })
       fs.writeFileSync(defaultPath, testKubeConfig)
