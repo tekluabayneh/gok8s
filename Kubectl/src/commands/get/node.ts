@@ -1,7 +1,7 @@
 import { Args, Command } from '@oclif/core'
 import createFlags from '../../flags/statis.js'
 import { nodeService } from '../../services/node.js'
-import creaetApi from '../../client/create_api.js'
+import creaetApi from '../../client/create-api.js'
 import { table } from 'table'
 
 
@@ -19,15 +19,12 @@ export default class Nodes extends Command {
 
 
     if (argv.length > 0) {
-      for (const element of argv) {
-        const url = `/api/v1/nodes/${element}`
+      await Promise.all(argv.map(async (name) => {
+        const url = `/api/v1/nodes/${name}`
         const tableData = await nodeService(api, url, null, "get")
         if (!tableData) return
         this.log(table(tableData))
-
-
-      }
-
+      }))
       return
     }
 

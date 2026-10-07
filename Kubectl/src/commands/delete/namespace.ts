@@ -1,7 +1,7 @@
 import { Args, Command } from '@oclif/core'
-import creaetApi from '../../client/create_api.js'
+import creaetApi from '../../client/create-api.js'
 import createFlags from '../../flags/statis.js'
-import { NamespaceService } from '../../services/namespace.js'
+import { nameSpaceService } from '../../services/namespace.js'
 import chalk from 'chalk'
 import { table } from 'table'
 
@@ -23,15 +23,15 @@ export default class DelNamespace extends Command {
       return
     }
 
-    for (const name of argv) {
-      const url = `/api/v1/namespaces/${name}`
-      const tableData = await NamespaceService(api, url, null, "delete", undefined, name as string)
-      if (!tableData) return
-      this.log(table(tableData))
+    await Promise.all(
+      argv.map(async (name) => {
+        const url = `/api/v1/namespaces/${name}`
+        const tableData = await nameSpaceService(api, url, null, "delete", undefined, name as string)
+        if (!tableData) return
+        this.log(table(tableData))
 
-
-
-    }
+      })
+    )
   }
 }
 

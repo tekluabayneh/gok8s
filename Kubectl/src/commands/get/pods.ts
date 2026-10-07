@@ -1,5 +1,5 @@
 import { Args, Command } from '@oclif/core'
-import creaetApi from '../../client/create_api.js'
+import creaetApi from '../../client/create-api.js'
 import chalk from 'chalk'
 import loadConfig from '../../client/config.js'
 import { podService } from '../../services/pod.js'

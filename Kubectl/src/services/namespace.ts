@@ -1,12 +1,11 @@
-
 import axios, { AxiosInstance, AxiosResponse } from "axios"
-import renderToTerminal, { ResourceMap } from "../utils/render-to-terminal.js"
+import renderToTerminal from "../utils/render-to-terminal.js"
 import chalk from "chalk"
 type ActionType = "create" | "delete" | "get"
 
 
 // this function must flexable to handle all kinds pods service
-export const NamespaceService = async (api: AxiosInstance | undefined, url: string, manifest: JSON | null | object, type: ActionType, args?: { nameOfNs: string | undefined }, filename?: string) => {
+export const nameSpaceService = async (api: AxiosInstance | undefined, url: string, manifest: JSON | null | object, type: ActionType, args?: { nameOfNs: string | undefined }, filename?: string) => {
   try {
     if (!api) {
       console.log(chalk.red("something went wrong Opps!"))
@@ -27,7 +26,7 @@ export const NamespaceService = async (api: AxiosInstance | undefined, url: stri
 
       case "delete": {
         res = await api.delete(url)
-        if (res.status == 200) {
+        if (res.status === 200) {
           console.log(chalk.green(`namespace "${args?.nameOfNs ?? filename}" deleted`))
         }
 
@@ -40,9 +39,8 @@ export const NamespaceService = async (api: AxiosInstance | undefined, url: stri
           console.log(`no resource are found `)
         }
 
-      }
-
         return renderToTerminal(res.data.items ?? [res.data], "Namespace")
+      }
 
       default: {
         console.log("default rached i dont why")
