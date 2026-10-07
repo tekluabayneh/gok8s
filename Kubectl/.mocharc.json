@@ -1,6 +1,7 @@
 {
   "require": [
-    "ts-node/register"
+    "ts-node/register",
+    "./test/script/setup.ts"
   ],
   "watch-extensions": [
     "ts"

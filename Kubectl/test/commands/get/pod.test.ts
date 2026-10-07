@@ -11,6 +11,9 @@ describe('get pods', () => {
   })
 
   it('gets and renders pods', async () => {
+    // HOT: 
+    // since create api is using url from kubectl this test fail in github action which need much more isolation than this 
+
     const api = await creaetApi()
     const scope = nock(api?.getUri()!)
       .get('/api/v1/namespaces/default/pods')
@@ -22,3 +25,5 @@ describe('get pods', () => {
     expect(stdout).to.include('redis')
   })
 })
+
+
