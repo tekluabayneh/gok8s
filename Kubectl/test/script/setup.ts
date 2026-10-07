@@ -1,5 +1,5 @@
 import { error } from "@oclif/core/errors";
-import fs, { stat } from "node:fs"
+import fs from "node:fs"
 import os from "node:os"
 import path from "node:path";
 
