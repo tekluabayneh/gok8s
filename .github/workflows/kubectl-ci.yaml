@@ -1,37 +1,47 @@
-name: Kubectl CI
+name: KubePilot CI
 
 on:
   push:
   pull_request:
 
 jobs:
-
+  # Lint checks the source code before we spend time building/testing it.
   lint:
     runs-on: ubuntu-latest
+
     steps:
+      # Every job gets a fresh runner, so every job needs its own checkout.
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: RUN Lint
-        run: echo "lint passed"
+      # Installs pnpm on the GitHub runner.
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
 
+      # Installs Node.js and enables pnpm dependency caching.
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: Kubectl/pnpm-lock.yaml
+
+      # pnpm does not have npm's "ci" command.
+      # --frozen-lockfile makes sure the lockfile is not modified in CI.
+      - name: Install dependencies
+        working-directory: ./Kubectl
+        run: pnpm install --frozen-lockfile
+
+      - name: Run lint
+        working-directory: ./Kubectl
+        run: pnpm run lint
+
+  # Builds the TypeScript application.
   build:
     needs: lint
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: RUN Build
-        run: echo "build passed"
-
-  test:
-    needs: build
-    runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: ./Kubectl
 
     steps:
       - name: Checkout repository
@@ -49,26 +59,65 @@ jobs:
           cache: pnpm
           cache-dependency-path: Kubectl/pnpm-lock.yaml
 
-      - name: install dependency
+      - name: Install dependencies
+        working-directory: ./Kubectl
         run: pnpm install --frozen-lockfile
 
-      - name: Run tests
-        run: pnpm run test
+      # This is your application build, NOT a Docker build.
+      - name: Build application
+        working-directory: ./Kubectl
+        run: pnpm run build
 
-      - name: build application
-        run: echo "application build passed"
-
-  docker:
-    needs:
-      - lint
-      - test
-      - build
-    if: github.ref == 'refs/heads/main'
+  # Runs the test suite after the build job succeeds.
+  test:
+    needs: build
     runs-on: ubuntu-latest
-    steps:
 
+    steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Build docker image
-        run: echo "Docker build passed"
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: Kubectl/pnpm-lock.yaml
+
+      - name: Install dependencies
+        working-directory: ./Kubectl
+        run: pnpm install --frozen-lockfile
+
+      # Your tests should use the central test setup we discussed earlier.
+      - name: Run tests
+        working-directory: ./Kubectl
+        run: pnpm run test
+
+  # This builds the Docker image only after lint, build and tests succeed.
+  # It runs only for pushes to the main branch.
+  docker:
+    needs:
+      - lint
+      - build
+      - test
+
+    if: github.ref == 'refs/heads/main'
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Docker is already available on ubuntu-latest.
+      - name: Build Docker image
+        working-directory: ./Kubectl
+        run: |
+          docker build \
+            -t kubepilot:${{ github.sha }} \
+            .
