@@ -1,6 +1,6 @@
 
 import axios, { AxiosInstance, AxiosResponse } from "axios"
-import renderToTerminal, { ResourceMap } from "../utils/render-to-terminal.js"
+import renderToTerminal from "../utils/render-to-terminal.js"
 import chalk from "chalk"
 type ActionType = "create" | "delete" | "get"
 
@@ -21,6 +21,7 @@ export const nodeService = async (api: AxiosInstance | undefined, url: string, m
         if (res?.data?.item ? res?.data?.items?.length === 0 : false) {
           console.log(`no resource are found`)
         }
+
         return renderToTerminal(res.data.items ?? [res.data], "Node")
       }
 

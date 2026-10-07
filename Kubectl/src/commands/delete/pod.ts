@@ -1,5 +1,5 @@
 import chalk from 'chalk'
-import creaetApi from '../../client/create_api.js'
+import creaetApi from '../../client/create-api.js'
 import createFlags from '../../flags/statis.js'
 import { podService } from '../../services/pod.js'
 import { Args, Command } from '@oclif/core'
@@ -26,16 +26,13 @@ export default class DelPods extends Command {
     }
 
 
-    for (const name of argv) {
+    await Promise.all(argv.map(async (name) => {
       const url = `/api/v1/namespaces/${namespace ?? "default"}/pods/${name}`
       const tableData = await podService(api, url, namespace, null, "delete", name as string)
       if (!tableData) return
       this.log(table(tableData))
 
-
-
-    }
-
+    }))
   }
 
 }
