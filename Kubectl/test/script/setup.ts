@@ -24,7 +24,7 @@ users:
 
 function createConfigFile() {
   try {
-    const defaultPath = os.homedir() + "/.kube/configfake.yaml"
+    const defaultPath = os.homedir() + "/.kube/config.yaml"
     fs.writeFileSync(defaultPath, testKubeConfig)
   } catch (error) {
     console.log(error)
