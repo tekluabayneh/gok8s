@@ -1,5 +1,7 @@
-import fs from "node:fs"
+import { error } from "@oclif/core/errors";
+import fs, { stat } from "node:fs"
 import os from "node:os"
+import path from "node:path";
 
 
 export const testKubeConfig = `
@@ -24,8 +26,15 @@ users:
 
 function createConfigFile() {
   try {
+
+    // much check first if files doe snot exist create the fils and add to there 
+    //
     const defaultPath = os.homedir() + "/.kube/config.yaml"
-    fs.writeFileSync(defaultPath, testKubeConfig)
+    if (fs.existsSync(defaultPath)) {
+      fs.mkdirSync(path.dirname(defaultPath), { recursive: true })
+      fs.writeFileSync(defaultPath, testKubeConfig)
+      console.log(error)
+    }
   } catch (error) {
     console.log(error)
   }
