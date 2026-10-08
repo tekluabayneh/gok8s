@@ -3,17 +3,17 @@ package internals
 import (
 	"context"
 
-	"github.com/tekluabayneh/gok8s/config"
 	"github.com/tekluabayneh/gok8s/internals/etcd"
 	"github.com/tekluabayneh/gok8s/utils"
 	clientv3 "go.etcd.io/etcd/client/v3"
+	corev1 "k8s.io/api/core/v1"
 )
 
 type EtcdStore struct {
 	Client *clientv3.Client
 }
 
-func (store *EtcdStore) GetPod(ctx context.Context, conf config.Pod) (string, error) {
+func (store *EtcdStore) GetPod(ctx context.Context, conf corev1.Pod) (string, error) {
 	// fmt.Println("this is the getPod object that handler logincs")
 	// LIFECYCLE: the GetPod() handler itself will stay in the code segment till there is request comming
 	// MEMORY: it won't go to the EITHER the Heap OR the Stack it state in the Code Segment

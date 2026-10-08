@@ -120,20 +120,26 @@ func main() {
 
 	// Spawns persistent gRPC watch streams for the foundational resources.
 	// The Go scheduler will park these goroutines when there is no cluster activity.
+	//
+	// go etcd.StartResourceInformer(context.Background(), etcdStore.Client, "gok8s/Node")
+	// go etcd.StartResourceInformer(context.Background(), etcdStore.Client, "gok8s/Pod")
+	//
+	// go etcd.StartResourceInformer(context.Background(), etcdStore.Client, "gok8s/Deployment")
+	// go etcd.StartResourceInformer(context.Background(), etcdStore.Client, "gok8s/ReplicaSets")
+	//
+	// go etcd.StartResourceInformer(context.Background(), etcdStore.Client, "gok8s/Service")
+	// go etcd.StartResourceInformer(context.Background(), etcdStore.Client, "gok8s/Endpoints")
+	//
+	// // 4. Configuration, Secrets, & Isolation Scopes
+	// go etcd.StartResourceInformer(context.Background(), etcdStore.Client, "gok8s/ConfigMaps")
+	// go etcd.StartResourceInformer(context.Background(), etcdStore.Client, "gok8s/Secrets")
+	// go etcd.StartResourceInformer(context.Background(), etcdStore.Client, "gok8s/Namespace")
+	//
+	resrouces := []string{"Namespace", "Secrets", "Configuration", "Service", "Deployment", "Node", "Pod", "ReplicaSets", "Endpoints", "Secrets"}
 
-	go etcd.StartResourceInformer(context.Background(), etcdStore.Client, "gok8s/Node")
-	go etcd.StartResourceInformer(context.Background(), etcdStore.Client, "gok8s/Pod")
-
-	go etcd.StartResourceInformer(context.Background(), etcdStore.Client, "gok8s/Deployment")
-	go etcd.StartResourceInformer(context.Background(), etcdStore.Client, "gok8s/ReplicaSets")
-
-	go etcd.StartResourceInformer(context.Background(), etcdStore.Client, "gok8s/Service")
-	go etcd.StartResourceInformer(context.Background(), etcdStore.Client, "gok8s/Endpoints")
-
-	// 4. Configuration, Secrets, & Isolation Scopes
-	go etcd.StartResourceInformer(context.Background(), etcdStore.Client, "gok8s/ConfigMaps")
-	go etcd.StartResourceInformer(context.Background(), etcdStore.Client, "gok8s/Secrets")
-	go etcd.StartResourceInformer(context.Background(), etcdStore.Client, "gok8s/Namespace")
+	for i := 0; i < len(resrouces); i++ {
+		go etcd.StartResourceInformer(context.Background(), etcdStore.Client, "gok8s/"+resrouces[i])
+	}
 
 	utils.InitLog(true, false)
 	// http server

@@ -5,16 +5,16 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/tekluabayneh/gok8s/Resconfig"
 	"github.com/tekluabayneh/gok8s/utils"
 	"go.etcd.io/etcd/api/v3/v3rpc/rpctypes"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	corev1 "k8s.io/api/core/v1"
 )
 
-func GetEtcd(ctx context.Context, client *clientv3.Client, conf Resconfig.Pod) (*clientv3.GetResponse, error) {
-	prefix := BuildKey(conf.Kind, conf.Metadata.Namespace, conf.Metadata.Name)
+func GetEtcd(ctx context.Context, client *clientv3.Client, conf corev1.Pod) (*clientv3.GetResponse, error) {
+	prefix := BuildKey(conf.Kind, conf.Namespace, conf.Name)
 	fmt.Println("prefix val\n", prefix)
 	// TODO
 	// before string yaml value change to string

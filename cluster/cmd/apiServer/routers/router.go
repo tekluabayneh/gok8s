@@ -70,7 +70,7 @@ func LoadRouter() *chi.Mux {
 		})
 
 		// pods
-		api.Post("/namespace/{namespace}/pods/{name}", HandlerPod.Get)
+		api.Post("/namespace/{namespace}/pods/{name}", HandlerPod.Create)
 		api.Post("/{namespace}/{name}", HandlerPod.Create)
 
 		// nodes

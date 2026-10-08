@@ -15,6 +15,7 @@
 # Go (Golang) Staff
 # ==============================================================================
 # Compiled binaries and directories
+vendor/
 bin/
 dist/
 architecture/output/

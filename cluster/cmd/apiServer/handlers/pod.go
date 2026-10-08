@@ -6,13 +6,14 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/tekluabayneh/gok8s/config"
+	"github.com/davecgh/go-spew/spew"
+
 	"github.com/tekluabayneh/gok8s/internals/decoder"
-	"github.com/tekluabayneh/gok8s/internals/mapper"
+	corev1 "k8s.io/api/core/v1"
 )
 
 type PodStore interface {
-	GetPod(ctx context.Context, res config.Pod) (string, error)
+	GetPod(ctx context.Context, res corev1.Pod) (string, error)
 	CreatePod(ctx context.Context, pod string) error
 	DeletePod(ctx context.Context, namespace string, pod string) error
 }
@@ -22,7 +23,10 @@ type PodHanlder struct {
 }
 
 func (p *PodHanlder) Get(w http.ResponseWriter, r *http.Request) {
-	PodData := decoder.Decoder(r)
+	PodData, err := decoder.Decoder[corev1.Pod](r)
+	if err != nil {
+		panic(err) // just for now it will be change with error handler
+	}
 	// LIFECYCLE: the Get() handler itself will stay in the code segment till there is request comming
 	// MEMORY: it won't go to the EITHER the Heap OR the Stack it state in the Code Segment
 	// FLOW: it only run when the cpu get request and want to access this handler block of code form the code segment
@@ -49,10 +53,12 @@ func (p *PodHanlder) Get(w http.ResponseWriter, r *http.Request) {
 	// this data need to be replaced by actual http body request
 	// HAVE ONE CENTRAL PLACE THAT HANDLE TRANSLATING THE INCOMING JSON TO FILLED WITH VOUE STRUCT SO I CAN JUST STORE IT
 	// AND ALSO DECIDED IF THE INCOMING BODY IS ONLY POD OR POD INSIDE DEPLOYMENT OR JUST IDENTIFY AND MAP TO APPROPRATE STRUCT
+	// fmt.Println("first one", PodData)
+	// fmt.Printf("%+v\n", PodData)
+	cfg := spew.ConfigState{Indent: "  ", DisableMethods: true}
+	cfg.Dump(PodData)
 
-	res := mapper.ToPod(PodData)
-
-	if _, err := p.Store.GetPod(ctx, res); err != nil {
+	if _, err := p.Store.GetPod(ctx, *PodData); err != nil {
 		fmt.Println(err)
 	}
 }
@@ -60,6 +66,7 @@ func (p *PodHanlder) Get(w http.ResponseWriter, r *http.Request) {
 func (p *PodHanlder) Create(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
 	defer cancel()
+
 	if err := p.Store.CreatePod(ctx, "name"); err != nil {
 		fmt.Println(err)
 	}
