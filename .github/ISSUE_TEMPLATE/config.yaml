@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discord Discussion
+    url: https://github.com/tekluabayneh/gok8s
+    about: For questions and general discussions, use
+  - name: 💬 GitHub Discussion
+    url: https://discord.gg/tekluabayneh/gok8s/disscussions
+    about: For documented trail of ideas, use GitHub Discussions
