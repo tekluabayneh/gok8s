@@ -2,18 +2,19 @@ package internals
 
 import (
 	"context"
+	"fmt"
 
-	"github.com/tekluabayneh/gok8s/config"
 	"github.com/tekluabayneh/gok8s/internals/etcd"
 	"github.com/tekluabayneh/gok8s/utils"
 	clientv3 "go.etcd.io/etcd/client/v3"
+	corev1 "k8s.io/api/core/v1"
 )
 
 type EtcdStore struct {
 	Client *clientv3.Client
 }
 
-func (store *EtcdStore) GetPod(ctx context.Context, conf config.Pod) (string, error) {
+func (store *EtcdStore) GetPod(ctx context.Context, conf corev1.Pod) (string, error) {
 	// fmt.Println("this is the getPod object that handler logincs")
 	// LIFECYCLE: the GetPod() handler itself will stay in the code segment till there is request comming
 	// MEMORY: it won't go to the EITHER the Heap OR the Stack it state in the Code Segment
@@ -25,17 +26,23 @@ func (store *EtcdStore) GetPod(ctx context.Context, conf config.Pod) (string, er
 	// 4. Failure: If request fail it wont' panic or crash the server it only request server error message
 
 	// res, err := etcd.GetEtcd(ctx, store.client, res)
-	_, err := etcd.GetEtcd(ctx, store.Client, conf)
+	res, err := etcd.GetEtcd(ctx, store.Client, conf)
 	if err != nil {
 		utils.Log().Error("GetEtcd function return error", "err message", err)
 	}
 
-	// fmt.Println(res)
+	fmt.Println(res)
 
 	return "", nil
 }
 
-func (store *EtcdStore) CreatePod(ctx context.Context, pod string) error {
+func (store *EtcdStore) CreatePod(ctx context.Context, conf corev1.Pod) error {
+	fmt.Println("val to check", conf.Namespace, conf.Name, conf.Kind)
+	res, err := etcd.StoreEtcd(ctx, store.Client, conf)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("this response form StoreEtcd", res)
 	// update yaml
 	// create pods yaml
 	// etc...

@@ -5,16 +5,16 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/tekluabayneh/gok8s/Resconfig"
 	"github.com/tekluabayneh/gok8s/utils"
 	"go.etcd.io/etcd/api/v3/v3rpc/rpctypes"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	corev1 "k8s.io/api/core/v1"
 )
 
-func GetEtcd(ctx context.Context, client *clientv3.Client, conf Resconfig.Pod) (*clientv3.GetResponse, error) {
-	prefix := BuildKey(conf.Kind, conf.Metadata.Namespace, conf.Metadata.Name)
+func GetEtcd(ctx context.Context, client *clientv3.Client, conf corev1.Pod) (*clientv3.GetResponse, error) {
+	prefix := BuildKey(conf.Kind, conf.Namespace, conf.Name)
 	fmt.Println("prefix val\n", prefix)
 	// TODO
 	// before string yaml value change to string
@@ -36,9 +36,17 @@ func GetEtcd(ctx context.Context, client *clientv3.Client, conf Resconfig.Pod) (
 	return res, nil
 }
 
-func StoreEtcd(ctx context.Context, client *clientv3.Client, name, namespace, value string, kind string) (*clientv3.PutResponse, error) {
-	prefix := BuildKey(kind, namespace, name)
-	res, err := client.Put(ctx, prefix, value)
+func StoreEtcd(ctx context.Context, client *clientv3.Client, value corev1.Pod) (*clientv3.PutResponse, error) {
+	prefix := BuildKey(value.Kind, value.Namespace, value.Name)
+	val, err := json.Marshal(value)
+	if err != nil {
+		panic(err)
+	}
+	if err != nil {
+		panic(err)
+	}
+
+	res, err := client.Put(ctx, prefix, string(val))
 	if err != nil {
 		return nil, handlerEtcdError(err)
 	}

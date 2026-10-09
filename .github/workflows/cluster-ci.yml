@@ -1,20 +1,33 @@
-name: cluster CI
+name: Cluster CI
 
 on:
   push:
   pull_request:
 
 jobs:
-
+  # Lint checks the source code before we spend time building/testing it.
   lint:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: RUN Lint
-        run: echo "lint passed"
+      # Installs Go on the GitHub runner.
+      - name: Setup go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
 
+      - name: Install dependencies
+        working-directory: ./cluster
+        run: go mod download
+
+      - name: Run lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          working-directory: ./cluster
+
+  # Builds the Go application.
   build:
     needs: lint
     runs-on: ubuntu-latest
@@ -22,9 +35,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: RUN Build
-        run: echo "build passed"
+      - name: Setup go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
 
+      - name: Build
+        working-directory: ./cluster
+        run: go build ./...
+
+  # Runs the test suite after the build job succeeds.
   test:
     needs: build
     runs-on: ubuntu-latest
@@ -32,23 +52,32 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+
       - name: Run tests
-        run: echo "Tests passed"
+        working-directory: ./cluster
+        run: go test ./...
 
-      - name: build application
-        run: echo "application build passed"
-
+  # Builds the Docker image only after lint, build and tests succeed.
+  # Runs only for pushes to the main branch.
   docker:
     needs:
       - lint
-      - test
       - build
+      - test
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Build docker image
-        run: echo "Docker build passed"
+      # Docker is already available on ubuntu-latest.
+      - name: Build Docker image
+        working-directory: ./cluster
+        run: |
+          docker build \
+            -t kubepilot:${{ github.sha }} \
+            .
