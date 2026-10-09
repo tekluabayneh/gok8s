@@ -14,13 +14,17 @@ import (
 
 type PodStore interface {
 	GetPod(ctx context.Context, res corev1.Pod) (string, error)
-	CreatePod(ctx context.Context, pod string) error
+	CreatePod(ctx context.Context, conf corev1.Pod) error
 	DeletePod(ctx context.Context, namespace string, pod string) error
 }
 
 type PodHanlder struct {
 	Store PodStore
 }
+
+// TODO:
+// check if user passed already exist resource
+// check if user passed wrong auth, invalid yaml, podname that conflict
 
 func (p *PodHanlder) Get(w http.ResponseWriter, r *http.Request) {
 	PodData, err := decoder.Decoder[corev1.Pod](r)
@@ -66,8 +70,12 @@ func (p *PodHanlder) Get(w http.ResponseWriter, r *http.Request) {
 func (p *PodHanlder) Create(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
 	defer cancel()
+	podData, err := decoder.Decoder[corev1.Pod](r)
+	if err != nil {
+		panic(err)
+	}
 
-	if err := p.Store.CreatePod(ctx, "name"); err != nil {
+	if err := p.Store.CreatePod(ctx, *podData); err != nil {
 		fmt.Println(err)
 	}
 }

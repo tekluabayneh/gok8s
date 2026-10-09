@@ -2,6 +2,7 @@ package internals
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/tekluabayneh/gok8s/internals/etcd"
 	"github.com/tekluabayneh/gok8s/utils"
@@ -25,17 +26,23 @@ func (store *EtcdStore) GetPod(ctx context.Context, conf corev1.Pod) (string, er
 	// 4. Failure: If request fail it wont' panic or crash the server it only request server error message
 
 	// res, err := etcd.GetEtcd(ctx, store.client, res)
-	_, err := etcd.GetEtcd(ctx, store.Client, conf)
+	res, err := etcd.GetEtcd(ctx, store.Client, conf)
 	if err != nil {
 		utils.Log().Error("GetEtcd function return error", "err message", err)
 	}
 
-	// fmt.Println(res)
+	fmt.Println(res)
 
 	return "", nil
 }
 
-func (store *EtcdStore) CreatePod(ctx context.Context, pod string) error {
+func (store *EtcdStore) CreatePod(ctx context.Context, conf corev1.Pod) error {
+	fmt.Println("val to check", conf.Namespace, conf.Name, conf.Kind)
+	res, err := etcd.StoreEtcd(ctx, store.Client, conf)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("this response form StoreEtcd", res)
 	// update yaml
 	// create pods yaml
 	// etc...

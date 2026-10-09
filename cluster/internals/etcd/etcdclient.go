@@ -36,9 +36,17 @@ func GetEtcd(ctx context.Context, client *clientv3.Client, conf corev1.Pod) (*cl
 	return res, nil
 }
 
-func StoreEtcd(ctx context.Context, client *clientv3.Client, name, namespace, value string, kind string) (*clientv3.PutResponse, error) {
-	prefix := BuildKey(kind, namespace, name)
-	res, err := client.Put(ctx, prefix, value)
+func StoreEtcd(ctx context.Context, client *clientv3.Client, value corev1.Pod) (*clientv3.PutResponse, error) {
+	prefix := BuildKey(value.Kind, value.Namespace, value.Name)
+	val, err := json.Marshal(value)
+	if err != nil {
+		panic(err)
+	}
+	if err != nil {
+		panic(err)
+	}
+
+	res, err := client.Put(ctx, prefix, string(val))
 	if err != nil {
 		return nil, handlerEtcdError(err)
 	}
