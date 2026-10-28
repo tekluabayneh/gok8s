@@ -27,7 +27,7 @@ type PodHanlder struct {
 // check if user passed wrong auth, invalid yaml, podname that conflict
 
 func (p *PodHanlder) Get(w http.ResponseWriter, r *http.Request) {
-	PodData, err := decoder.Decoder[corev1.Pod](r)
+	PodData, err := decoder.Decoder[corev1.Pod](r.Body) // i have to investigate about this r.body mean why do i read request body why not response
 	if err != nil {
 		panic(err) // just for now it will be change with error handler
 	}
@@ -70,7 +70,7 @@ func (p *PodHanlder) Get(w http.ResponseWriter, r *http.Request) {
 func (p *PodHanlder) Create(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
 	defer cancel()
-	podData, err := decoder.Decoder[corev1.Pod](r)
+	podData, err := decoder.Decoder[corev1.Pod](r.Body)
 	if err != nil {
 		panic(err)
 	}
