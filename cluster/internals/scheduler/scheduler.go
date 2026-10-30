@@ -47,6 +47,7 @@ func (s *Scheduler) Run(ctx context.Context, events <-chan Types.WatchEvent) {
 func Evaluator(p v1.Pod) []*Types.NodeInfo {
 	var SuitedNodeForThePod []*Types.NodeInfo
 	nodelist := handlers.HandlerNodeStatus()
+	scoreNode := noderesourece.NewScorer("least")
 	f := noderesourece.NewFilterResource()
 
 	// if p.Spec.NodeName != "" {
@@ -54,12 +55,11 @@ func Evaluator(p v1.Pod) []*Types.NodeInfo {
 	// }
 
 	for _, val := range nodelist {
-		fesiableNode, reson := f.Filter(&Types.NodeInfo{Node: &val}, p)
-
+		fesiableNode, reson := f.Filter(&Types.NodeInfo{Node: &val, Pods: []*v1.Pod{}}, p)
 		SuitedNodeForThePod = append(SuitedNodeForThePod, fesiableNode)
 		fmt.Println(reson)
-	}
 
-	noderesourece.Score(SuitedNodeForThePod)
+	}
+	scoreNode.Score(&p, SuitedNodeForThePod)
 	return SuitedNodeForThePod
 }
