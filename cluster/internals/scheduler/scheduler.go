@@ -56,9 +56,10 @@ func Evaluator(p v1.Pod) []*Types.NodeInfo {
 
 	for _, val := range nodelist {
 		fesiableNode, reson := f.Filter(&Types.NodeInfo{Node: &val, Pods: []*v1.Pod{}}, p)
-		SuitedNodeForThePod = append(SuitedNodeForThePod, fesiableNode)
+		if fesiableNode != nil {
+			SuitedNodeForThePod = append(SuitedNodeForThePod, fesiableNode)
+		}
 		fmt.Println(reson)
-
 	}
 	scoreNode.Score(&p, SuitedNodeForThePod)
 	return SuitedNodeForThePod
