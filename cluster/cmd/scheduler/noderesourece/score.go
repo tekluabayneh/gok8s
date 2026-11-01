@@ -49,10 +49,6 @@ func (sc *Scorer) Score(po *v1.Pod, nodeinfo []*Types.NodeInfo) {
 }
 
 func (sc *Scorer) scoreLeastAllocated(pod *v1.Pod, node *Types.NodeInfo) int64 {
-	if len(node.Pods) == 0 {
-		fmt.Errorf("pods are empty so i will error out")
-		return 0
-	}
 	var usedmem int64
 	var usedcpu int64
 
@@ -137,11 +133,14 @@ func (sc *Scorer) scoreResourceAllocation(pod *v1.Pod, node *Types.NodeInfo) int
 	case BalancedAllocation:
 		return sc.scoreBalancedAllocation(pod, node)
 	default:
-		return sc.scoreLeastAllocated(pod, node) // use the default one if no type is provided
+		return sc.scoreLeastAllocated(pod, node)
 	}
 }
 
 func (sc *Scorer) scoreNodeAffinity(pod *v1.Pod, node *Types.NodeInfo) int64 {
+	if pod.Spec.Affinity == nil || pod.Spec.Affinity.NodeAffinity == nil {
+		return 0
+	}
 	terms := pod.Spec.Affinity.NodeAffinity.PreferredDuringSchedulingIgnoredDuringExecution
 	var total int64
 	for _, term := range terms {
