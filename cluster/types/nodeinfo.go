@@ -9,12 +9,10 @@ type NodeInfo struct {
 	Node *corev1.Node
 
 	// computed from the node
-	AllocCPU    int64 // milli
-	AllocMemory int64 // bytes
-	AllocPods   int64
-
-	// maintained by your cache from pod events
-	Pods         []*corev1.Pod // i may need to update this
+	AllocCPU     int64
+	AllocMemory  int64
+	AllocPods    int64
+	Pods         []*corev1.Pod
 	RequestedCPU int64
 	RequestedMem int64
 	UsedPorts    map[int32]bool
