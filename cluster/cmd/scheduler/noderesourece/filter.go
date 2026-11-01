@@ -183,6 +183,7 @@ func buildNodeInfo(node Types.NodeInfo, po v1.Pod) *Types.NodeInfo {
 		Node:        node.Node,
 		AllocCPU:    alloc.Cpu().MilliValue(),
 		AllocMemory: alloc.Memory().Value(),
+		Pods:        []*v1.Pod{},
 		AllocPods:   alloc.Pods().Value(),
 		UsedPorts:   map[int32]bool{},
 		// RequestedCPU: po.Status.Resources.Requests.Cpu().Value(), // this tow are total pods cpu value
