@@ -7,77 +7,7 @@ import (
 	Types "github.com/tekluabayneh/gok8s/types"
 )
 
-//
-// func ToNodeInfo(n corev1.Node) Types.NodeInfo {
-// 	// pull only what the evaluator needs out of the big struct
-// 	// hint: n.Status.Allocatable["cpu"] is a resource.Quantity,
-// 	// use .MilliValue() for cpu and .Value() for memory
-// 	return Types.NodeInfo{
-// 	Node *corev1.Node
-//
-// 	// computed from the node
-// 	AllocCPU    int64 // milli
-// 	AllocMemory int64 // bytes
-// 	AllocPods   int64
-//
-// 	// maintained by your cache from pod events
-// 	Pods         []*corev1.Pod
-// 	RequestedCPU int64
-// 	RequestedMem int64
-// 	UsedPorts    map[int32]bool
-//
-// }
-//
-//
-// 	}
-// }
-
-// check if node fits the pod spec
-// check if node healthy  Done
-// Unschedulable flag. node.Spec.Unschedulable for cordoned nodes. done
-// Pod count. A node has a max number of pods, and Allocatable includes a pods entry.
-// nodeSelector. If the pod says nodeSelector: disk=ssd, the node’s labels must match all of them.
-// Node affinity. The fancier version of nodeSelector (required rules only; preferred rules belong in scoring).
-// Already bound. Skip pods where Spec.NodeName is already set. Only schedule pending, unassigned ones.
-// Pod already requested a specific node. If Spec.NodeName is set by the user, it bypasses scheduling entirely.
-// Other resources. Ephemeral storage, and GPUs if you ever care.
-// Host ports. Two pods can’t both claim the same hostPort on one node.
-
-// ============================================================
-// 1. BEFORE SCHEDULING (queue / informer filter, never reaches Filter)
-// ============================================================
-
-// Already bound: skip pods where Spec.NodeName is already set.
-//   Only pending, unassigned pods go into the scheduling queue.
-// Pod pinned to a node by the user: same check as above.
-//   Spec.NodeName set means scheduling is bypassed, the kubelet just runs it.
-
-// ============================================================
-// 2. FILTER (hard yes/no per node, a node that fails is out)
-// ============================================================
-
-// Node health / pressure conditions: Done
-//   Ready false, MemoryPressure, DiskPressure, PIDPressure. done
-//   (Real k8s turns these into taints; a plain condition check is fine for you.)
-// Unschedulable flag: node.Spec.Unschedulable for cordoned nodes. Done
-
-// Resource fit: pod requests <= allocatable - already requested
-//    CPU, memory, ephemeral storage, extended resources / GPUs.
-// Pod count: Requested pod count + 1 <= Allocatable["pods"].
-
-// nodeSelector: every label in the pod's nodeSelector must match the node's labels.
-// Node affinity (required rules only): requiredDuringSchedulingIgnoredDuringExecution.
-// Host ports: no two pods can claim the same hostPort on one node.
-
-type Filterresouce struct {
-	// Resourcecheker               func() bool
-	// NodeSelector                 func() bool
-	// Fit                          func() bool
-	// Nodehealthpressureconditions func(node *v1.Node) bool
-	// Filter                       func(nodes *Types.NodeInfo, p v1.Pod, fesiable []*Types.NodeInfo) ([]*Types.NodeInfo, map[string]string)
-	// Node                         func(node *Types.NodeInfo) *v1.Node
-	//
-}
+type Filterresouce struct{}
 
 func NewFilterResource() *Filterresouce {
 	return &Filterresouce{}
@@ -89,8 +19,8 @@ func (r *Filterresouce) Filter(ni *Types.NodeInfo, p v1.Pod) (*Types.NodeInfo, m
 	reson := map[string]string{}
 	var fesiable *Types.NodeInfo
 	if !r.Nodehealthpressureconditions(ni.Node) {
-		reson[ni.Node.Name] = "node is not healthy" // reson need to be update
-		return fesiable, reson                      // which mean if the node is not sutable we just return that node cache we get form params only add the node node to fesiable if the node is fesiable node
+		reson[ni.Node.Name] = "node is not healthy"
+		return fesiable, reson // which mean if the node is not sutable we just return that node cache we get form params only add the node node to fesiable if the node is fesiable node
 	}
 
 	// not only return false it may have to be change to something like node2{fit:false, reson:res_alocated } and other stuff
@@ -115,9 +45,6 @@ func (r *Filterresouce) Filter(ni *Types.NodeInfo, p v1.Pod) (*Types.NodeInfo, m
 }
 
 func (r *Filterresouce) Nodehealthpressureconditions(n *v1.Node) bool {
-	// cfg := spew.ConfigState{Indent: "  ", DisableMethods: true}
-	// cfg.Dump(n.Status.Conditions)
-
 	if n.Spec.Unschedulable {
 		return false
 	}
@@ -139,17 +66,12 @@ func (r *Filterresouce) Nodehealthpressureconditions(n *v1.Node) bool {
 }
 
 func (r *Filterresouce) Resourcecheker(n v1.Node, p v1.Pod) bool {
-	// n.Status.NodeInfo.OSImage // need to check if pods fits with it like if pod may need to run i certain criterrica
-	//
 	label := n.Labels
-	// HOT: this failteration may need to be remove as it prevent all pod to be assing in the control-plane node but static pod can be assined here and may need to use n.Spec.Taint
 	for leb := range label {
 		if leb == "node-role.kubernetes.io/control-plane" {
 			return false
 		}
 	}
-	// node-role.kubernetes.io/control-plane"
-	// getNodeRoles(item)?.length > 0 ? getNodeRoles(item) : "<none>",
 
 	return true
 }
