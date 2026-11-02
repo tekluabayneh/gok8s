@@ -13,8 +13,6 @@ func SendhearBeat() {
 		select {
 		case <-ticker.C:
 			fmt.Println("Ticker start hearbeat")
-		default:
-			fmt.Println("not yet")
 		}
 	}
 }
