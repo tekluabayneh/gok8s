@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	"path/filepath"
 
 	Types "github.com/tekluabayneh/gok8s/types"
 	"github.com/tekluabayneh/gok8s/utils"
@@ -43,7 +44,18 @@ type NamedContext struct {
 }
 
 func ExtractKubeConfig() Types.ApiKubeconfig {
-	file := ReadFile(".kube/config")
+	// name := os.Getenv("SUDO_USER")
+	// if name == "" {
+	// 	name = os.Getenv("USER")
+	// }
+	// user, err := user.Lookup(name)
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	kubePath := filepath.Join(".kube", "config")
+	file := ReadFile(kubePath)
+
 	jsofile := utils.YamlToJson(file)
 
 	da := Types.ApiKubeconfig{}
