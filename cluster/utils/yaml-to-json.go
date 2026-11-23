@@ -9,3 +9,11 @@ func YamlToJson(file string) []byte {
 	}
 	return jsofile
 }
+
+func JsonToYaml(file string) []byte {
+	jsofile, err := yaml.JSONToYAML([]byte(file))
+	if err != nil {
+		panic(err)
+	}
+	return jsofile
+}
