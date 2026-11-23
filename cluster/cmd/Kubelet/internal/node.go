@@ -24,8 +24,16 @@ type Kub struct {
 
 var (
 	defaultbool bool
-	HostName    = "kind-control-planemm"
+	HostName    = "kind-node"
 )
+
+type NodeConditionType string
+
+const NodeReady NodeConditionType = "Ready"
+
+type ConditionStatus string
+
+const ConditionTrue ConditionStatus = "True"
 
 func NewKubelet(kl *Kub) *types.Kubelet {
 	newNode, err := kl.RegisterNode()
@@ -43,13 +51,13 @@ func NewKubelet(kl *Kub) *types.Kubelet {
 	// 	MaxDepth:                4,
 	// }
 	//
-	b, err := json.MarshalIndent(newNode, "", "")
+	_, err = json.MarshalIndent(newNode, "", "")
 	if err != nil {
 		panic(nil)
 	}
 
-	json := utils.YamlToJson(string(b))
-	fmt.Println(string(json))
+	// json := utils.YamlToJson(string(b))
+	// fmt.Println(string(json))
 	// cfg.Dump(json)
 
 	newkubelet := &types.Kubelet{
@@ -156,14 +164,15 @@ func (k *Kub) RegisterNode() (*v1.Node, error) {
 
 	SystemUUID, err := os.ReadFile("/sys/class/dmi/id/product_uuid")
 	if err != nil {
-		panic(err)
+		SystemUUID, err = os.ReadFile("/etc/machine-id")
+	} else {
+		SystemUUID = []byte(utils.UuidGenerator())
 	}
 
 	KernelVersion, err := host.KernelVersion()
 	if err != nil {
 		panic(err)
 	}
-
 	node.Status.NodeInfo = v1.NodeSystemInfo{
 		Architecture:            runtime.GOARCH,
 		BootID:                  strings.TrimSpace(string(bootId)),
@@ -242,13 +251,20 @@ func (kl *Kub) SyncNodeStatus() error {
 	if err != nil {
 		panic(err)
 	}
-	node.Status.Conditions = []v1.NodeCondition{ // we may now don't need to add this condtion since condition are based on how that particular kubelet operate and ongiong opration
+	isRuntimeUP := true // i am addin this to test but isRuntimeUP is checking image and continr are running
+	status := v1.ConditionTrue
+	if !isRuntimeUP {
+		status = v1.ConditionFalse
+	}
+
+	node.Status.Conditions = []v1.NodeCondition{
 		{
-			// LastTransitionTime: "2026-09-04T14:07:28Z",
-			Message: "kubelet has sufficient memory available",
-			Reason:  "KubeletHasSufficientMemory",
-			Status:  "True",
-			Type:    "Ready-fake",
+			Type:               v1.NodeReady,
+			Status:             status,
+			Reason:             "KubeletReady",
+			Message:            "kubelet is posting ready status",
+			LastHeartbeatTime:  metav1.Now(),
+			LastTransitionTime: metav1.Now(),
 		},
 	}
 
@@ -259,7 +275,7 @@ func (kl *Kub) SyncNodeStatus() error {
 // Goal: the cheap heartbeat. Update one small Lease object (named after the node,
 // in the kube-node-lease namespace) every ~10 seconds, so the control plane
 // can tell the node is alive without receiving the whole Node status each time.
-// func (k *Kubelet) renewLease() error { return nil }
+// func (k *Kub) renewLease() error { return nil }
 
 // ============================================================
 // 2. POD CONFIG SOURCE   [DAEMON]
@@ -285,7 +301,7 @@ func (kl *Kub) SyncNodeStatus() error {
 // Methods to include: PullImage, CreateContainer, StartContainer,
 // StopContainer, ListContainers, ContainerStatus.
 // Write a fake in-memory version first, so you can test the sync loop without a runtime.
-// type Runtime interface{}
+type Runtime interface{}
 
 // TODO: ensureImage
 // Goal: pull an image only when needed.
