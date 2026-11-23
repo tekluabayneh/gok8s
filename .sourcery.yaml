@@ -1,0 +1,4 @@
+github:
+  ignore_labels:
+    - sourcery-ignore
+  request_review: author

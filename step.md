@@ -6,3 +6,6 @@ Remaining workload resources (Deployment → ReplicaSet → Pod chain)
 Service + Endpoints
 ConfigMap, Secret
 Admission pipeline (stub → real RBAC)
+
+Schduler jobs:
+assign newly created  pods to nodes

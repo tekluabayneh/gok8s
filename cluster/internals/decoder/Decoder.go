@@ -2,7 +2,7 @@ package decoder
 
 import (
 	"encoding/json"
-	"net/http"
+	"io"
 
 	"github.com/tekluabayneh/gok8s/utils"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -13,9 +13,9 @@ type ptTypeObject[T any] interface {
 	metav1.Object
 }
 
-func Decoder[T any, PT ptTypeObject[T]](r *http.Request) (PT, error) {
+func Decoder[T any, PT ptTypeObject[T]](r io.Reader) (PT, error) {
 	jsonData := PT(new(T))
-	if err := json.NewDecoder(r.Body).Decode(&jsonData); err != nil {
+	if err := json.NewDecoder(r).Decode(&jsonData); err != nil {
 		utils.Log().WithGroup("Debugger").Debug("Decoder failed to decode", "err", err)
 		return nil, err
 	}

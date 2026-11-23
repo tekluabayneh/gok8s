@@ -4,7 +4,12 @@ import (
 	"fmt"
 	"time"
 
-	server "github.com/tekluabayneh/gok8s/cmd/Kubelet/cmd"
+	"github.com/tekluabayneh/gok8s/cmd/Kubelet/internal"
+)
+
+var (
+	defaultbool bool
+	HostName    = "kind-control-planemm"
 )
 
 func SendhearBeat() {
@@ -13,14 +18,15 @@ func SendhearBeat() {
 		select {
 		case <-ticker.C:
 			fmt.Println("Ticker start hearbeat")
-		default:
-			fmt.Println("not yet")
 		}
 	}
 }
 
 func main() {
-	go SendhearBeat() /// having function with ticker time and for loop and go routing are hard to maintine since they run in diffrent proccess tey each access and update the time resulting error so the ticker start sending wont' really wait the second we specify so this need to be updated
+	// cli, req := config.CreatApi()
+	// go SendhearBeat() /// having function with ticker time and for loop and go routing are hard to maintine since they run in diffrent proccess tey each access and update the time resulting error so the ticker start sending wont' really wait the second we specify so this need to be updated
+	// fmt.Println("che")
+	// server.Start().KubeServer() // this server can be fork-join for our demon job
 
-	server.Start().KubeServer() // this server can be fork-join for our demon job
+	internal.RegNode()
 }

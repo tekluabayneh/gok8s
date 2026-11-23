@@ -1,0 +1,94 @@
+apiVersion: v1
+kind: Node
+metadata:
+  annotations:
+    node.alpha.kubernetes.io/ttl: "0"
+    volumes.kubernetes.io/controller-managed-attach-detach: "true"
+  creationTimestamp: "2026-11-23T15:18:28Z"
+  labels:
+    beta.kubernetes.io/arch: amd64
+    beta.kubernetes.io/os: linux
+    kubernetes.io/arch: amd64
+    kubernetes.io/hostname: kind-control-planemm
+    kubernetes.io/os: linux
+  name: kind-control-planemm
+  resourceVersion: "497843"
+  uid: 14dd5bb7-1174-4bc5-b47c-3901fb01ef52
+spec:
+  podCIDR: 10.244.3.0/24
+  podCIDRs:
+  - 10.244.3.0/24
+  taints:
+  - effect: NoSchedule
+    key: node.kubernetes.io/unreachable
+    timeAdded: "2026-11-23T15:19:31Z"
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    timeAdded: "2026-11-23T15:19:31Z"
+status:
+  addresses:
+  - address: 192.168.1.8
+    type: InternalIP
+  - address: Teklu
+    type: Hostname
+  allocatable:
+    cpu: "4"
+    ephemeral-storage: 10Gi
+    hugepages-1Gi: "0"
+    hugepages-2Mi: "0"
+    memory: 4Gi
+    pods: "110"
+  capacity:
+    cpu: "12"
+    ephemeral-storage: 10Gi
+    hugepages-1Gi: "0"
+    hugepages-2Mi: "0"
+    memory: "7973629952"
+    pods: "110"
+  conditions:
+  - lastHeartbeatTime: "2026-11-23T15:18:28Z"
+    lastTransitionTime: "2026-11-23T15:19:31Z"
+    message: Kubelet never posted node status.
+    reason: NodeStatusNeverUpdated
+    status: Unknown
+    type: Ready
+  - lastHeartbeatTime: "2026-11-23T15:18:28Z"
+    lastTransitionTime: "2026-11-23T15:19:31Z"
+    message: Kubelet never posted node status.
+    reason: NodeStatusNeverUpdated
+    status: Unknown
+    type: MemoryPressure
+  - lastHeartbeatTime: "2026-11-23T15:18:28Z"
+    lastTransitionTime: "2026-11-23T15:19:31Z"
+    message: Kubelet never posted node status.
+    reason: NodeStatusNeverUpdated
+    status: Unknown
+    type: DiskPressure
+  - lastHeartbeatTime: "2026-11-23T15:18:28Z"
+    lastTransitionTime: "2026-11-23T15:19:31Z"
+    message: Kubelet never posted node status.
+    reason: NodeStatusNeverUpdated
+    status: Unknown
+    type: PIDPressure
+  daemonEndpoints:
+    kubeletEndpoint:
+      Port: 10250
+  features:
+    supplementalGroupsPolicy: false
+  nodeInfo:
+    architecture: amd64
+    bootID: 43023216-ca04-48c0-8816-435c44dc4a08
+    containerRuntimeVersion: containerd://2.2.0
+    kernelVersion: 7.2.15-arch1-1
+    kubeProxyVersion: v1.0.0
+    kubeletVersion: v1.35.0
+    machineID: 2d2cf636-20ef-4aae-a598-9a08a9987d61
+    operatingSystem: linux
+    osImage: ""
+    swap: {}
+    systemUUID: 16420f90aa114810b36218c44e5b5ebc
+  runtimeHandlers:
+  - features:
+      recursiveReadOnlyMounts: false
+      userNamespaces: false
+    name: ""
